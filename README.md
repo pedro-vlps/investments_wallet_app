@@ -22,7 +22,28 @@ Build on each target OS with `flutter build windows`, `flutter build macos`, or
 build requires Visual Studio with the Desktop development with C++ workload.
 The application is desktop-only for now; mobile platform projects are not generated.
 
-If using the workspace SDK on Windows:
+For Windows development, double-click `run-dev.cmd` in the project root, or run
+this single command in PowerShell:
+
+```powershell
+.\run-dev.cmd
+```
+
+The launcher prepares dependencies and starts the Windows app in debug mode.
+It uses `.tools/flutter` and a project-local package cache when the workspace SDK
+is available; otherwise it uses Flutter from PATH. It works regardless of the
+terminal's current directory. Keep its terminal open while developing: press `r`
+for hot reload, `R` for a hot restart, or `q` to stop the app. The window pauses
+after exit so dependency and build errors remain readable. The launcher requires
+the Windows build tools described above and may use the network for dependencies.
+
+For normal use without a development terminal, open
+`build/windows/x64/runner/Release/investments_wallet.exe` directly, or create a
+Windows shortcut to it. Keep the executable alongside its DLLs and data folder.
+This runs the last release build; code changes require a new build or the
+development launcher.
+
+If using the workspace SDK on Windows manually:
 
 ```powershell
 $env:PUB_CACHE = Join-Path (Get-Location) '.tools/pub-cache'
