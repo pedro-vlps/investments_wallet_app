@@ -7,6 +7,10 @@ import '../dividends/presentation/dividend_controller.dart';
 import '../app_storage/open_wallet_storage.dart';
 import '../reports/data/sqlite_report_repository.dart';
 import '../reports/presentation/report_controller.dart';
+import '../tax/data/sqlite_tax_repository.dart';
+import '../tax/data/tax_report_writer.dart';
+import '../tax/data/tax_rule_checker.dart';
+import '../tax/presentation/tax_controller.dart';
 
 import '../portfolio/data/sqlite_portfolio_repository.dart';
 import '../portfolio/presentation/portfolio_controller.dart';
@@ -25,6 +29,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   PortfolioController? _controller;
   DividendController? _dividendController;
   ReportController? _reportController;
+  TaxController? _taxController;
   SqlitePortfolioRepository? _repository;
   bool _failed = false;
 
@@ -51,11 +56,26 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         SqliteDividendRepository(repository.databasePath),
       );
       _dividendController = dividendController;
+      final reportRepository = SqliteReportRepository(
+        storage.databasePath,
+        storage.reportDirectory,
+      );
+      final taxController = TaxController(
+        SqliteTaxRepository(storage.databasePath),
+        reportRepository,
+        TaxRuleChecker(_client),
+        TaxReportWriter(storage.directory),
+      );
+      _taxController = taxController;
       final reportController = ReportController(
-        SqliteReportRepository(storage.databasePath, storage.reportDirectory),
+        reportRepository,
         dataDirectory: storage.directory,
         onImported: () async {
-          await Future.wait([controller.load(), dividendController.load()]);
+          await Future.wait([
+            controller.load(),
+            dividendController.load(),
+            taxController.loadYear(taxController.year),
+          ]);
         },
       );
       _reportController = reportController;
@@ -63,6 +83,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         controller.load(),
         dividendController.load(),
         reportController.load(),
+        taxController.initialize(),
       ]);
       if (mounted) setState(() {});
     } catch (_) {
@@ -75,6 +96,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
     _controller?.dispose();
     _dividendController?.dispose();
     _reportController?.dispose();
+    _taxController?.dispose();
     _client.close();
     final repository = _repository;
     if (repository != null) unawaited(repository.close());
@@ -88,6 +110,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         controller: controller,
         dividendController: _dividendController!,
         reportController: _reportController!,
+        taxController: _taxController!,
       );
     }
     return Scaffold(

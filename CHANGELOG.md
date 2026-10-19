@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.0 - 2026-10-19
+
+- Add an Income Tax workspace before Reports with monthly assisted assessments, hypothetical planning, and seasonal auxiliary annual reports.
+- Persist reviewed monthly net results, opening tax losses, IRRF credits, and manually recorded DARF principal payments in the local backup database.
+- Separate common, day-trade, and FII tax groups, apply the eligible stock-sales exemption, and carry subminimum DARF amounts without treating missing months as zero.
+- Monitor eight official Receita Federal sources with six-month full checks, manual refresh, offline/change warnings, and more frequent filing-deadline checks during preparation season.
+- Export local HTML reconciliation reports for closed years during the annual preparation window; distinguish these files from complete declarations, PGD imports, and official transmissions.
+- Document unsupported automatic fiscal inputs, source-withheld products, income-specific rules, and the need for reviewed application updates when legislation changes.
+
 ## v0.5.0 - 2026-10-18
 
 - Remove the portfolio tagline, local-storage badges, and quote/return footnotes from both portfolio views.

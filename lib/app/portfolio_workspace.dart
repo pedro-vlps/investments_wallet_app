@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import '../tax/presentation/tax_controller.dart';
+import '../tax/presentation/tax_page.dart';
 import '../dividends/presentation/dividend_controller.dart';
 import '../dividends/presentation/dividend_page.dart';
 import '../reports/presentation/report_controller.dart';
@@ -14,11 +17,13 @@ class PortfolioWorkspace extends StatefulWidget {
     required this.controller,
     required this.dividendController,
     required this.reportController,
+    required this.taxController,
     super.key,
   });
   final PortfolioController controller;
   final DividendController dividendController;
   final ReportController reportController;
+  final TaxController taxController;
 
   @override
   State<PortfolioWorkspace> createState() => _PortfolioWorkspaceState();
@@ -43,7 +48,10 @@ class _PortfolioWorkspaceState extends State<PortfolioWorkspace> {
                 reportsExpanded: _reportsExpanded,
                 onReportsToggle: () =>
                     setState(() => _reportsExpanded = !_reportsExpanded),
-                onSelected: (index) => setState(() => _selectedIndex = index),
+                onSelected: (index) {
+                  setState(() => _selectedIndex = index);
+                  if (index == 3) unawaited(widget.taxController.checkRules());
+                },
                 onToggle: canExtend
                     ? () => setState(() => _extended = !_extended)
                     : null,
@@ -66,10 +74,11 @@ class _PortfolioWorkspaceState extends State<PortfolioWorkspace> {
                         controller: widget.dividendController,
                       ),
                     ),
+                    TaxPage(controller: widget.taxController),
                     ReportManagementPage(
                       controller: widget.reportController,
                       onAdd: () => setState(() {
-                        _selectedIndex = 4;
+                        _selectedIndex = 5;
                         _reportsExpanded = true;
                       }),
                     ),

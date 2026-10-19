@@ -25,9 +25,9 @@ class PortfolioNavigation extends StatelessWidget {
     minWidth: 64,
     minExtendedWidth: 216,
     extended: extended,
-    selectedIndex: selectedIndex >= 3 ? 3 : selectedIndex,
+    selectedIndex: selectedIndex >= 4 ? 4 : selectedIndex,
     onDestinationSelected: (index) =>
-        index == 3 ? onReportsToggle() : onSelected(index),
+        index == 4 ? onReportsToggle() : onSelected(index),
     leading: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: IconButton(
@@ -47,12 +47,12 @@ class PortfolioNavigation extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _reportLink(
-                  3,
+                  4,
                   'Gerenciar relatórios',
                   Icons.folder_open_outlined,
                 ),
                 _reportLink(
-                  4,
+                  5,
                   'Adicionar relatórios',
                   Icons.upload_file_outlined,
                 ),
@@ -93,6 +93,17 @@ class PortfolioNavigation extends StatelessWidget {
           child: Icon(Icons.payments),
         ),
         label: Text('Dividendos'),
+      ),
+      const NavigationRailDestination(
+        icon: Tooltip(
+          message: 'Imposto de Renda',
+          child: Icon(Icons.receipt_long_outlined),
+        ),
+        selectedIcon: Tooltip(
+          message: 'Imposto de Renda',
+          child: Icon(Icons.receipt_long),
+        ),
+        label: Text('Imposto de Renda'),
       ),
       NavigationRailDestination(
         icon: Tooltip(

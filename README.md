@@ -235,6 +235,9 @@ export was available for validation.
 - `lib/reports/domain`: parsed trades, report contracts, classification, and broker-specific holding projection.
 - `lib/reports/data`: B3 XLSX/CSV parsing, report schema, local archive, and transactional imports.
 - `lib/reports/presentation`: upload/review, classifications, report list, and backup instructions.
+- `lib/tax/domain`: monthly tax assessments, compensation groups, planning, annual report contracts, and reviewed tax parameters.
+- `lib/tax/data`: local fiscal records, official-source monitoring, and auxiliary HTML exports.
+- `lib/tax/presentation`: assisted assessments, scenario inputs, annual preparation, and rule-check warnings.
 - `lib/app_storage`: portable data directory preparation and legacy database migration.
 - `lib/app`: composition, application lifecycle, and the dark theme.
 
@@ -246,6 +249,11 @@ reused after a technology change. Changing the quote source requires implementin
 the interface and porting Dart rules; this design reduces coupling, not migration cost to zero.
 
 ## Verification
+
+The Income Tax workspace is an assisted reconciliation tool for Brazilian resident
+individuals, not a complete tax-return service. Its scope, sources, calculation
+contracts, update behavior, and limitations are documented in
+[Brazilian income tax](docs/brazilian-income-tax.md).
 
 ```sh
 dart format --output=none --set-exit-if-changed lib

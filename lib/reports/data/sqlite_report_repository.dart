@@ -19,6 +19,16 @@ class SqliteReportRepository implements ReportRepository {
   final String databasePath;
   final String reportDirectory;
 
+  @override
+  Future<List<ReportTrade>> listTrades() => Isolate.run(() {
+    final database = sqlite3.open(databasePath, mode: OpenMode.readOnly);
+    try {
+      return hasReports(database) ? _trades(database) : <ReportTrade>[];
+    } finally {
+      database.close();
+    }
+  });
+
   /// Portfolio and dividends use these public infrastructure contracts.
   static bool hasReports(Database database) =>
       database
