@@ -159,25 +159,8 @@ class _DividendPageState extends State<DividendPage> {
                     extendedPeriods: true,
                     onChanged: (value) => setState(() => _totalPeriod = value),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PortfolioReturnChart(
-                        months: report.monthly(_totalPeriod, withReturns: true),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Linhas: rentabilidade acumulada desde o início, '
-                        'exibida no período selecionado. Retorno simples sobre o custo registrado em cada avaliação, '
-                        'sem reinvestimento, taxas ou impostos. Meses sem avaliação interrompem as linhas; '
-                        'o mês atual considera somente os dados disponíveis até hoje.',
-                        style: TextStyle(
-                          color: WalletColors.muted,
-                          fontSize: 12,
-                          height: 1.6,
-                        ),
-                      ),
-                    ],
+                  child: PortfolioReturnChart(
+                    months: report.monthly(_totalPeriod, withReturns: true),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -207,16 +190,6 @@ class _DividendPageState extends State<DividendPage> {
                             key: const ValueKey('provisioned-total'),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Filtro pela data de pagamento. Desde o início inclui pagamentos futuros provisionados; '
-                        'os demais períodos terminam hoje. Valores por ação têm até 6 casas decimais.',
-                        style: TextStyle(
-                          color: WalletColors.muted,
-                          fontSize: 12,
-                          height: 1.6,
-                        ),
                       ),
                       const SizedBox(height: 16),
                       DividendPaymentsTable(

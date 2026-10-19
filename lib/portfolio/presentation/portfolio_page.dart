@@ -77,14 +77,6 @@ class PortfolioPage extends StatelessWidget {
                                   letterSpacing: -1,
                                 ),
                               ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Seu patrimônio, sob seu controle.',
-                                style: TextStyle(
-                                  color: WalletColors.muted,
-                                  fontSize: 15,
-                                ),
-                              ),
                             ],
                           ),
                           FilledButton.icon(
@@ -232,38 +224,6 @@ class PortfolioPage extends StatelessWidget {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 24),
-                    const Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
-                      children: [
-                        Text(
-                          '● Dados salvos localmente em SQLite',
-                          style: TextStyle(
-                            color: WalletColors.accent,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          'Internet apenas ao atualizar cotações',
-                          style: TextStyle(
-                            color: WalletColors.muted,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Cotações podem ter atraso e refletem o horário informado pelo provedor. '
-                      'Rentabilidade de preço sem dividendos; acumulada inclui os dividendos recebidos registrados. '
-                      'Valores sem taxas ou impostos. Para ativos importados, o preço da última operação é usado até uma atualização de cotação. Proventos e histórico de rentabilidade importados ainda não estão disponíveis.',
-                      style: TextStyle(
-                        color: WalletColors.muted,
-                        fontSize: 12,
-                        height: 1.6,
-                      ),
-                    ),
                   ],
                 ),
               ),

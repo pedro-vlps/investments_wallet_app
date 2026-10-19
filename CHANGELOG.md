@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0 - 2026-10-18
+
+- Remove the portfolio tagline, local-storage badges, and quote/return footnotes from both portfolio views.
+- Remove explanatory text below the dividend return chart and above the dividend payment table, preserving the charts, calculations, and filters.
+
 ## v0.4.0 - 2026-10-18
 
 - Add an expandable Reports submenu with local XLSX/CSV upload, classification review, and report management.
