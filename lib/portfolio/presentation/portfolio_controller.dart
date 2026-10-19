@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../quotes/domain/quote_provider.dart';
 import '../domain/portfolio_position.dart';
 import '../domain/portfolio_repository.dart';
+import '../domain/asset_category.dart';
 
 class PortfolioController extends ChangeNotifier {
   PortfolioController(this._repository, this._quoteProvider);
@@ -37,19 +38,29 @@ class PortfolioController extends ChangeNotifier {
     notice = null;
     _emit();
     try {
+      final eligible = positions
+          .where((p) => p.category != AssetCategory.treasury)
+          .toList();
+      if (eligible.isEmpty) {
+        notice =
+            'Tesouro Direto mantém o preço da última operação. A atualização automática de títulos ainda não está disponível.';
+        return;
+      }
       final quotes = await _quoteProvider.fetchQuotes(
-        positions.map((position) => position.symbol).toList(),
+        eligible.map((position) => position.symbol).toList(),
       );
-      if (quotes.length != positions.length ||
+      if (quotes.length != eligible.length ||
           !quotes
               .map((q) => q.symbol)
               .toSet()
-              .containsAll(positions.map((p) => p.symbol))) {
+              .containsAll(eligible.map((p) => p.symbol))) {
         throw const QuoteException('O provedor retornou dados incompletos.');
       }
       await _repository.saveQuotes(quotes);
       positions = await _repository.loadPositions();
-      notice = 'Consulta concluída. Exibindo as últimas cotações disponíveis.';
+      notice =
+          'Consulta concluída. Exibindo as últimas cotações disponíveis.'
+          '${eligible.length < positions.length ? ' Tesouro Direto mantém o preço da última operação.' : ''}';
     } on QuoteException catch (failure) {
       error = '${failure.message} Os dados salvos foram mantidos.';
     } catch (_) {

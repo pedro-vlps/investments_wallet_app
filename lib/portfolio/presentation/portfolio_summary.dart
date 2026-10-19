@@ -21,7 +21,7 @@ class PortfolioSummary extends StatelessWidget {
       _SummaryCard(
         label: 'Total investido',
         value: formatMoney(totals.investedCents),
-        caption: 'Custo de aquisição fictício · sem taxas',
+        caption: 'Custo de aquisição · sem taxas',
         icon: Icons.savings_outlined,
       ),
       _SummaryCard(

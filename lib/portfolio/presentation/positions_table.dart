@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../domain/portfolio_position.dart';
 import '../domain/portfolio_totals.dart';
@@ -93,7 +94,10 @@ class _PositionsTableState extends State<PositionsTable> {
     final text = switch (column) {
       PositionTableColumn.symbol => position.symbol,
       PositionTableColumn.company => position.company,
-      PositionTableColumn.quantity => '${position.quantity}',
+      PositionTableColumn.quantity => NumberFormat(
+        '#,##0.######',
+        'pt_BR',
+      ).format(position.quantity),
       PositionTableColumn.averageCost => formatMoney(position.averageCostCents),
       PositionTableColumn.invested => formatMoney(position.investedCents),
       PositionTableColumn.quotePrice => formatMoney(position.quote.priceCents),

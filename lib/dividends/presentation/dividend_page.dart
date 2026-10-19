@@ -101,16 +101,18 @@ class _DividendPageState extends State<DividendPage> {
                   key: ValueKey('dividends-title'),
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Demonstração: pagamentos, valores por ação, datas e histórico da carteira são fictícios. '
-                  'Provisionados não entram nos valores recebidos ou na rentabilidade. Nenhuma consulta à internet é necessária.',
-                  style: TextStyle(
-                    color: WalletColors.muted,
-                    fontSize: 13,
-                    height: 1.6,
+                if (!controller.data.demo) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Sua carteira usa relatórios importados. A importação de proventos e do histórico de rentabilidade '
+                    'ainda não está disponível. Os dados fictícios foram ocultados.',
+                    style: TextStyle(
+                      color: WalletColors.muted,
+                      fontSize: 13,
+                      height: 1.6,
+                    ),
                   ),
-                ),
+                ],
                 const SizedBox(height: 24),
                 DividendSection(
                   title: 'Dividendos recebidos',

@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.0 - 2026-10-18
+
+- Add an expandable Reports submenu with local XLSX/CSV upload, classification review, and report management.
+- Import B3 negotiation and movement purchases and sales for stocks, FIIs, ETFs, BDRs, and Tesouro Direto, excluding derivatives and unsupported events with visible reasons.
+- Classify BDR trading codes automatically, including alphanumeric roots, ETF-backed receipts, and fractional-market code normalization.
+- Preserve broker attribution, fractional treasury quantities, original files, and duplicate-safe imports across overlapping periods.
+- Store the database and reports in a portable Documents/InvestmentsWallet folder and migrate the previous support database without overwriting restored data.
+- Build imported holdings from recorded trades and retain transaction prices until an optional quote refresh.
+- Distinguish native file-selector startup failures from file-read errors and explain when a full development restart is required.
+- Remove bundled demo data, automatic sample seeding, and demonstration notices so new installations start with an empty portfolio.
+
 ## v0.3.0 - 2026-10-18
 
 - Add a Dividendos workspace with independent received, total-history, and payment-table period filters.

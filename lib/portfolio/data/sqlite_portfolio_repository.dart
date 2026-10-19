@@ -2,11 +2,13 @@ import 'dart:isolate';
 
 import 'package:sqlite3/sqlite3.dart';
 import '../../dividends/data/sqlite_dividend_repository.dart';
+import '../../reports/data/sqlite_report_repository.dart';
 
 import '../../quotes/domain/market_quote.dart';
 import '../domain/portfolio_position.dart';
 import '../domain/portfolio_repository.dart';
 import 'portfolio_schema.dart';
+import 'imported_portfolio_positions.dart';
 
 class SqlitePortfolioRepository implements PortfolioRepository {
   SqlitePortfolioRepository(this.databasePath);
@@ -14,10 +16,10 @@ class SqlitePortfolioRepository implements PortfolioRepository {
 
   // Each operation opens its own connection in a worker isolate. SQLite work
   // never blocks animation, and no native connection crosses isolate boundaries.
-  Future<void> initialize(String demoJson) => Isolate.run(() {
+  Future<void> initialize() => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
-      initializePortfolioSchema(database, demoJson);
+      initializePortfolioSchema(database);
     } finally {
       database.close();
     }
@@ -27,6 +29,9 @@ class SqlitePortfolioRepository implements PortfolioRepository {
   Future<List<PortfolioPosition>> loadPositions() => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
+      if (SqliteReportRepository.hasReports(database)) {
+        return loadImportedPortfolioPositions(database);
+      }
       final dividends = SqliteDividendRepository.receivedTotals(
         database,
         DateTime.now(),
@@ -65,13 +70,16 @@ class SqlitePortfolioRepository implements PortfolioRepository {
       database.execute('PRAGMA foreign_keys = ON');
       database.execute('BEGIN IMMEDIATE');
       try {
+        final table = SqliteReportRepository.hasReports(database)
+            ? 'imported_quotes'
+            : 'quotes';
         for (final quote in quotes) {
           database.execute(
             '''
-            INSERT INTO quotes VALUES (?, ?, ?, ?)
+            INSERT INTO $table VALUES (?, ?, ?, ?)
             ON CONFLICT(symbol) DO UPDATE SET price_cents = excluded.price_cents,
               quoted_at = excluded.quoted_at, source = excluded.source
-            WHERE excluded.quoted_at >= quotes.quoted_at
+            WHERE excluded.quoted_at >= $table.quoted_at
           ''',
             [
               quote.symbol,

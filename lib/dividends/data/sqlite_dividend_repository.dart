@@ -4,6 +4,7 @@ import 'package:sqlite3/sqlite3.dart';
 
 import '../domain/dividend_payment.dart';
 import '../domain/dividend_repository.dart';
+import '../../reports/data/sqlite_report_repository.dart';
 
 class SqliteDividendRepository implements DividendRepository {
   const SqliteDividendRepository(this.databasePath);
@@ -23,6 +24,9 @@ class SqliteDividendRepository implements DividendRepository {
   Future<DividendData> loadData() => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
+      if (SqliteReportRepository.hasReports(database)) {
+        return const DividendData(payments: [], valuations: [], demo: false);
+      }
       final payments = database
           .select('SELECT * FROM dividends ORDER BY paid_at DESC, id')
           .map(

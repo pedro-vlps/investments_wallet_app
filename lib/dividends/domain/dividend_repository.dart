@@ -16,7 +16,12 @@ class PortfolioValuation {
 }
 
 class DividendData {
-  const DividendData({required this.payments, required this.valuations});
+  const DividendData({
+    required this.payments,
+    required this.valuations,
+    this.demo = true,
+  });
+  final bool demo;
   final List<DividendPayment> payments;
   final List<PortfolioValuation> valuations;
 }

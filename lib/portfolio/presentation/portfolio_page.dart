@@ -130,36 +130,6 @@ class PortfolioPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 28),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: WalletColors.accent.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: WalletColors.border),
-                      ),
-                      child: const Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.science_outlined,
-                            size: 20,
-                            color: WalletColors.accent,
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Carteira de demonstração · Investidor fictício\n'
-                              'Quantidades, preços de compra e dividendos fictícios. Cotações reais da brapi, com data e fonte indicadas.',
-                              style: TextStyle(
-                                color: WalletColors.muted,
-                                height: 1.6,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     if (controller.error != null ||
                         controller.notice != null) ...[
                       const SizedBox(height: 16),
@@ -286,8 +256,8 @@ class PortfolioPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     const Text(
                       'Cotações podem ter atraso e refletem o horário informado pelo provedor. '
-                      'Rentabilidade de preço sem dividendos; acumulada inclui os dividendos recebidos demonstrativos. '
-                      'Valores sem taxas ou impostos. Importação de notas será adicionada posteriormente.',
+                      'Rentabilidade de preço sem dividendos; acumulada inclui os dividendos recebidos registrados. '
+                      'Valores sem taxas ou impostos. Para ativos importados, o preço da última operação é usado até uma atualização de cotação. Proventos e histórico de rentabilidade importados ainda não estão disponíveis.',
                       style: TextStyle(
                         color: WalletColors.muted,
                         fontSize: 12,

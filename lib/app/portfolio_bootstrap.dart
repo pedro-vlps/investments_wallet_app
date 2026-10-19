@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import '../dividends/data/sqlite_dividend_repository.dart';
 import '../dividends/presentation/dividend_controller.dart';
+import '../app_storage/open_wallet_storage.dart';
+import '../reports/data/sqlite_report_repository.dart';
+import '../reports/presentation/report_controller.dart';
 
 import '../portfolio/data/sqlite_portfolio_repository.dart';
 import '../portfolio/presentation/portfolio_controller.dart';
@@ -24,6 +24,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   final _client = http.Client();
   PortfolioController? _controller;
   DividendController? _dividendController;
+  ReportController? _reportController;
   SqlitePortfolioRepository? _repository;
   bool _failed = false;
 
@@ -36,14 +37,9 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   Future<void> _initialize() async {
     setState(() => _failed = false);
     try {
-      final directory = await getApplicationSupportDirectory();
-      await directory.create(recursive: true);
-      final repository = SqlitePortfolioRepository(
-        path.join(directory.path, 'portfolio.sqlite3'),
-      );
-      await repository.initialize(
-        await rootBundle.loadString('assets/demo_portfolio.json'),
-      );
+      final storage = await openWalletStorage();
+      final repository = SqlitePortfolioRepository(storage.databasePath);
+      await repository.initialize();
       if (!mounted) return;
       final controller = PortfolioController(
         repository,
@@ -55,7 +51,19 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         SqliteDividendRepository(repository.databasePath),
       );
       _dividendController = dividendController;
-      await Future.wait([controller.load(), dividendController.load()]);
+      final reportController = ReportController(
+        SqliteReportRepository(storage.databasePath, storage.reportDirectory),
+        dataDirectory: storage.directory,
+        onImported: () async {
+          await Future.wait([controller.load(), dividendController.load()]);
+        },
+      );
+      _reportController = reportController;
+      await Future.wait([
+        controller.load(),
+        dividendController.load(),
+        reportController.load(),
+      ]);
       if (mounted) setState(() {});
     } catch (_) {
       if (mounted) setState(() => _failed = true);
@@ -66,6 +74,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   void dispose() {
     _controller?.dispose();
     _dividendController?.dispose();
+    _reportController?.dispose();
     _client.close();
     final repository = _repository;
     if (repository != null) unawaited(repository.close());
@@ -78,6 +87,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
       return PortfolioWorkspace(
         controller: controller,
         dividendController: _dividendController!,
+        reportController: _reportController!,
       );
     }
     return Scaffold(
