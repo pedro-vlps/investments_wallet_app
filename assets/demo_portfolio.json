@@ -1,13 +1,66 @@
 {
-  "description": "Fictional holdings. Real BRL quote snapshots returned by brapi on 2026-10-17. Cost basis is fictional and excludes fees.",
+  "description": "Fictional holdings, cost basis, and received dividends. Real BRL quote snapshots returned by brapi on 2026-10-17. Fees and taxes are excluded.",
   "positions": [
-    {"symbol": "PETR4", "company": "Petrobras", "quantity": 100, "averageCostCents": 5200},
-    {"symbol": "VALE3", "company": "Vale", "quantity": 80, "averageCostCents": 6900},
-    {"symbol": "ITUB4", "company": "Itaú Unibanco", "quantity": 150, "averageCostCents": 4350}
+    {
+      "symbol": "PETR4",
+      "company": "Petrobras",
+      "quantity": 100,
+      "averageCostCents": 5200
+    },
+    {
+      "symbol": "VALE3",
+      "company": "Vale",
+      "quantity": 80,
+      "averageCostCents": 6900
+    },
+    {
+      "symbol": "ITUB4",
+      "company": "Itaú Unibanco",
+      "quantity": 150,
+      "averageCostCents": 4350
+    }
+  ],
+  "dividends": [
+    {
+      "id": "demo-petr4-20261001",
+      "symbol": "PETR4",
+      "amountCents": 32000,
+      "paidAt": "2026-10-01"
+    },
+    {
+      "id": "demo-vale3-20261002",
+      "symbol": "VALE3",
+      "amountCents": 28000,
+      "paidAt": "2026-10-02"
+    },
+    {
+      "id": "demo-itub4-20261005",
+      "symbol": "ITUB4",
+      "amountCents": 9000,
+      "paidAt": "2026-10-05"
+    }
   ],
   "quotes": [
-    {"symbol": "PETR4", "priceCents": 5968, "quotedAt": "2026-10-16T21:30:30Z", "source": "brapi · initial snapshot", "sourceUrl": "https://brapi.dev/api/quote/PETR4"},
-    {"symbol": "VALE3", "priceCents": 6621, "quotedAt": "2026-10-16T21:30:30Z", "source": "brapi · initial snapshot", "sourceUrl": "https://brapi.dev/api/quote/VALE3"},
-    {"symbol": "ITUB4", "priceCents": 4809, "quotedAt": "2026-10-17T02:29:23Z", "source": "brapi · initial snapshot", "sourceUrl": "https://brapi.dev/api/quote/ITUB4"}
+    {
+      "symbol": "PETR4",
+      "priceCents": 5968,
+      "quotedAt": "2026-10-16T21:30:30Z",
+      "source": "brapi · initial snapshot",
+      "sourceUrl": "https://brapi.dev/api/quote/PETR4"
+    },
+    {
+      "symbol": "VALE3",
+      "priceCents": 6621,
+      "quotedAt": "2026-10-16T21:30:30Z",
+      "source": "brapi · initial snapshot",
+      "sourceUrl": "https://brapi.dev/api/quote/VALE3"
+    },
+    {
+      "symbol": "ITUB4",
+      "priceCents": 4809,
+      "quotedAt": "2026-10-17T02:29:23Z",
+      "source": "brapi · initial snapshot",
+      "sourceUrl": "https://brapi.dev/api/quote/ITUB4"
+    }
   ]
 }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:sqlite3/sqlite3.dart';
@@ -6,6 +5,7 @@ import 'package:sqlite3/sqlite3.dart';
 import '../../quotes/domain/market_quote.dart';
 import '../domain/portfolio_position.dart';
 import '../domain/portfolio_repository.dart';
+import 'portfolio_schema.dart';
 
 class SqlitePortfolioRepository implements PortfolioRepository {
   SqlitePortfolioRepository(this.databasePath);
@@ -16,55 +16,7 @@ class SqlitePortfolioRepository implements PortfolioRepository {
   Future<void> initialize(String demoJson) => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
-      database.execute('PRAGMA foreign_keys = ON');
-      final version =
-          database.select('PRAGMA user_version').single['user_version'] as int;
-      if (version > 1) throw StateError('Unsupported database schema');
-      database.execute('BEGIN IMMEDIATE');
-      try {
-        database.execute('''
-          CREATE TABLE IF NOT EXISTS positions (
-            symbol TEXT PRIMARY KEY, company TEXT NOT NULL,
-            quantity INTEGER NOT NULL CHECK (quantity > 0),
-            average_cost_cents INTEGER NOT NULL CHECK (average_cost_cents > 0)
-          )
-        ''');
-        database.execute('''
-          CREATE TABLE IF NOT EXISTS quotes (
-            symbol TEXT PRIMARY KEY REFERENCES positions(symbol),
-            price_cents INTEGER NOT NULL CHECK (price_cents > 0),
-            quoted_at TEXT NOT NULL, source TEXT NOT NULL
-          )
-        ''');
-        if (version == 0) {
-          final demo = jsonDecode(demoJson) as Map<String, dynamic>;
-          for (final item in demo['positions'] as List<dynamic>) {
-            final row = item as Map<String, dynamic>;
-            database.execute('INSERT INTO positions VALUES (?, ?, ?, ?)', [
-              row['symbol'],
-              row['company'],
-              row['quantity'],
-              row['averageCostCents'],
-            ]);
-          }
-          for (final item in demo['quotes'] as List<dynamic>) {
-            final row = item as Map<String, dynamic>;
-            database.execute('INSERT INTO quotes VALUES (?, ?, ?, ?)', [
-              row['symbol'],
-              row['priceCents'],
-              DateTime.parse(
-                row['quotedAt'] as String,
-              ).toUtc().toIso8601String(),
-              row['source'],
-            ]);
-          }
-          database.execute('PRAGMA user_version = 1');
-        }
-        database.execute('COMMIT');
-      } catch (_) {
-        database.execute('ROLLBACK');
-        rethrow;
-      }
+      initializePortfolioSchema(database, demoJson);
     } finally {
       database.close();
     }
@@ -76,7 +28,9 @@ class SqlitePortfolioRepository implements PortfolioRepository {
     try {
       return database
           .select('''
-        SELECT p.*, q.price_cents, q.quoted_at, q.source
+        SELECT p.*, q.price_cents, q.quoted_at, q.source,
+          COALESCE((SELECT SUM(d.amount_cents) FROM dividends d
+            WHERE d.symbol = p.symbol), 0) AS dividends_received_cents
         FROM positions p JOIN quotes q ON q.symbol = p.symbol
         ORDER BY p.symbol
       ''')
@@ -85,6 +39,7 @@ class SqlitePortfolioRepository implements PortfolioRepository {
               symbol: row['symbol'] as String,
               company: row['company'] as String,
               quantity: row['quantity'] as int,
+              dividendsReceivedCents: row['dividends_received_cents'] as int,
               averageCostCents: row['average_cost_cents'] as int,
               quote: MarketQuote(
                 symbol: row['symbol'] as String,

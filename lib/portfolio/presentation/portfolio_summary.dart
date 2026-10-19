@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/wallet_theme.dart';
 import '../domain/portfolio_totals.dart';
 import 'portfolio_format.dart';
+import 'return_color.dart';
 
 class PortfolioSummary extends StatelessWidget {
   const PortfolioSummary({required this.totals, super.key});
@@ -28,9 +29,7 @@ class PortfolioSummary extends StatelessWidget {
         value: formatMoney(totals.gainCents),
         caption: '${formatPercent(totals.gainPercent)} sobre o valor investido',
         icon: Icons.show_chart,
-        valueColor: totals.gainCents >= 0
-            ? WalletColors.accent
-            : WalletColors.loss,
+        valueColor: returnColor(totals.gainCents),
       ),
     ];
     return LayoutBuilder(

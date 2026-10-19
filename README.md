@@ -1,8 +1,31 @@
 # Local Wallet
 
 An offline-first Flutter desktop portfolio for Windows, macOS, and Linux.
-The first iteration uses a fictional B3 portfolio, real quote snapshots, an
-optional manual quote refresh, and a dark interface. No app account or server is required.
+The application uses a fictional B3 portfolio, real quote snapshots, an optional
+manual quote refresh, and a dark interface. No app account or server is required.
+
+## Portfolio views
+
+The left navigation switches between the summary and detailed portfolio tables.
+Use the menu button to collapse or expand the sidebar; narrow windows use the
+compact icon menu automatically. Both views share the same positions and quotes.
+Click any column heading to sort ascending, and click again to reverse the order.
+Sorting uses underlying numeric values and timestamps, not formatted text.
+The horizontal scrollbar exposes additional columns in narrow windows.
+
+The detailed view adds invested capital, portfolio weight, received dividends,
+and cumulative gains in BRL and percent. Each attribute, including company,
+quote source, and quote time, has its own sortable column.
+
+- Portfolio weight = asset market value / total portfolio market value.
+- Price return = (market value - acquisition cost) / acquisition cost.
+- Cumulative return = (market value - acquisition cost + received dividends) / acquisition cost.
+
+Returns are simple, non-annualized, and exclude taxes and fees; dividends are not
+automatically reinvested or compounded. Positive returns are green, negative
+returns are red, and exact zero uses the default text color. Dividends are
+fictional total cash payments for these example holdings, not real company
+dividend data or per-share amounts. Only quote prices are fetched from brapi.
 
 ## Run
 
@@ -75,7 +98,10 @@ All responses must be valid before an atomic SQLite update. Older quotes never
 replace newer saved quotes. Network/provider failures retain existing saved data.
 Money is stored and calculated in integer BRL cents; the HTTP boundary rounds
 quotes to cents. Quantities are positive whole shares in this first iteration.
-Results are unrealized price differences, excluding fees, taxes, and dividends.
+Price-only results are unrealized price differences excluding dividends;
+cumulative results include the received cash dividends. Both exclude fees and taxes.
+
+Dividend schema migrations do not replace existing holdings or saved quotes.
 
 Data is not encrypted and is stored under the current operating system user.
 Uninstall/reinstall recovery, backups, real portfolio editing, and brokerage note
@@ -84,7 +110,7 @@ import are future work. Data must not be assumed recoverable after app deletion.
 ## Context boundaries and technology changes
 
 - `lib/portfolio/domain`: positions, totals, and the repository contract; pure Dart.
-- `lib/portfolio/data`: SQLite schema, one-time seeding, and atomic persistence.
+- `lib/portfolio/data`: SQLite schema migrations, one-time seeding, dividends, and atomic persistence.
 - `lib/portfolio/presentation`: the portfolio controller and responsive widgets.
 - `lib/quotes/domain`: provider contract and quote values; pure Dart.
 - `lib/quotes/data`: validated brapi HTTP integration.
@@ -105,11 +131,12 @@ flutter analyze
 flutter test
 ```
 
-Tests cover exact monetary totals, persistence after reopening, seed idempotency,
-atomic rollback, stale quotes, offline refresh, duplicate refresh prevention,
-provider response validation, and desktop/narrow layouts.
+Tests cover exact monetary totals, dividend-inclusive returns, portfolio weights,
+persistence after reopening, schema migration, seed idempotency, atomic rollback,
+stale quotes, offline refresh, duplicate refresh prevention, provider validation,
+all table sorts, navigation, return colors, and desktop/narrow layouts.
 
-Validated on Windows on 2026-10-18: all 15 tests passed, static analysis and
+Validated on Windows on 2026-10-18: all 35 tests passed, static analysis and
 formatting checks passed, and `flutter build windows --release --no-pub`
 produced `build/windows/x64/runner/Release/investments_wallet.exe`.
 Distribute the entire Release directory, including its DLLs and data folder,

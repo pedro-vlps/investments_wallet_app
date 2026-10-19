@@ -13,6 +13,7 @@ final _timestamp = DateFormat('dd/MM/yyyy HH:mm');
 
 String formatMoney(int cents) => _currency.format(cents / 100);
 String formatPercent(double value) =>
-    '${value >= 0 ? '+' : ''}${_percentage.format(value)}%';
+    '${value > 0 ? '+' : ''}${_percentage.format(value)}%';
+String formatWeight(double value) => '${_percentage.format(value)}%';
 String formatQuoteTime(DateTime time) =>
     '${_timestamp.format(time.toLocal())} (local)';

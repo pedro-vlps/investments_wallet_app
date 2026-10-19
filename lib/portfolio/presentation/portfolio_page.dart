@@ -7,8 +7,13 @@ import 'portfolio_summary.dart';
 import 'positions_table.dart';
 
 class PortfolioPage extends StatelessWidget {
-  const PortfolioPage({required this.controller, super.key});
+  const PortfolioPage({
+    required this.controller,
+    this.detailed = false,
+    super.key,
+  });
   final PortfolioController controller;
+  final bool detailed;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -26,7 +31,7 @@ class PortfolioPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(
                           Icons.stacked_line_chart_rounded,
@@ -34,15 +39,16 @@ class PortfolioPage extends StatelessWidget {
                           size: 30,
                         ),
                         SizedBox(width: 12),
-                        Text(
-                          'LOCAL WALLET',
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.w700,
+                        const Expanded(
+                          child: Text(
+                            'LOCAL WALLET',
+                            style: TextStyle(
+                              fontSize: 16,
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                        Spacer(),
                         Tooltip(
                           message:
                               'Carteira armazenada neste dispositivo. Nenhum login necessário.',
@@ -58,11 +64,13 @@ class PortfolioPage extends StatelessWidget {
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final header = <Widget>[
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Minha carteira',
+                                detailed
+                                    ? 'Carteira detalhada'
+                                    : 'Minha carteira',
                                 style: TextStyle(
                                   fontSize: 34,
                                   fontWeight: FontWeight.w600,
@@ -141,7 +149,7 @@ class PortfolioPage extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Carteira de demonstração · Investidor fictício\n'
-                              'Quantidades e preços de compra fictícios. Cotações reais da brapi, com data e fonte indicadas.',
+                              'Quantidades, preços de compra e dividendos fictícios. Cotações reais da brapi, com data e fonte indicadas.',
                               style: TextStyle(
                                 color: WalletColors.muted,
                                 height: 1.6,
@@ -231,7 +239,25 @@ class PortfolioPage extends StatelessWidget {
                               ),
                             ),
                             const Divider(height: 1),
-                            PositionsTable(positions: controller.positions),
+                            if (detailed)
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
+                                child: Text(
+                                  'Posição = valor do ativo / valor da carteira. Acumulada = '
+                                  '(valor atual − custo + dividendos recebidos) / custo. '
+                                  'Retorno simples, sem reinvestimento. Clique nos cabeçalhos para ordenar.',
+                                  style: TextStyle(
+                                    color: WalletColors.muted,
+                                    fontSize: 12,
+                                    height: 1.6,
+                                  ),
+                                ),
+                              ),
+                            PositionsTable(
+                              key: ValueKey(detailed),
+                              positions: controller.positions,
+                              detailed: detailed,
+                            ),
                           ],
                         ),
                       ),
@@ -260,7 +286,8 @@ class PortfolioPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     const Text(
                       'Cotações podem ter atraso e refletem o horário informado pelo provedor. '
-                      'Resultado sem taxas, impostos ou proventos. Importação de notas será adicionada posteriormente.',
+                      'Rentabilidade de preço sem dividendos; acumulada inclui os dividendos recebidos demonstrativos. '
+                      'Valores sem taxas ou impostos. Importação de notas será adicionada posteriormente.',
                       style: TextStyle(
                         color: WalletColors.muted,
                         fontSize: 12,

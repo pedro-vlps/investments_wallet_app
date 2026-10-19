@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../../app/wallet_theme.dart';
 import '../domain/portfolio_position.dart';
+import '../domain/portfolio_totals.dart';
 import 'portfolio_format.dart';
+import 'position_table_column.dart';
+import 'return_color.dart';
 
 class PositionsTable extends StatefulWidget {
-  const PositionsTable({required this.positions, super.key});
+  const PositionsTable({
+    required this.positions,
+    this.detailed = false,
+    super.key,
+  });
   final List<PortfolioPosition> positions;
+  final bool detailed;
 
   @override
   State<PositionsTable> createState() => _PositionsTableState();
@@ -14,6 +21,8 @@ class PositionsTable extends StatefulWidget {
 
 class _PositionsTableState extends State<PositionsTable> {
   final _horizontalScroll = ScrollController();
+  PositionTableColumn _sortColumn = PositionTableColumn.symbol;
+  bool _ascending = true;
 
   @override
   void dispose() {
@@ -22,9 +31,18 @@ class _PositionsTableState extends State<PositionsTable> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      return Scrollbar(
+  Widget build(BuildContext context) {
+    final columns = PositionTableColumn.values
+        .where((column) => widget.detailed || !column.detailedOnly)
+        .toList();
+    final positions = sortPositions(
+      widget.positions,
+      _sortColumn,
+      ascending: _ascending,
+    );
+    final marketValue = PortfolioTotals(widget.positions).marketValueCents;
+    return LayoutBuilder(
+      builder: (context, constraints) => Scrollbar(
         controller: _horizontalScroll,
         thumbVisibility: true,
         child: SingleChildScrollView(
@@ -35,114 +53,86 @@ class _PositionsTableState extends State<PositionsTable> {
             constraints: BoxConstraints(minWidth: constraints.maxWidth),
             child: DataTable(
               horizontalMargin: 24,
-              columnSpacing: 30,
-              columns: const [
-                DataColumn(label: Text('ATIVO')),
-                DataColumn(label: Text('QUANTIDADE'), numeric: true),
-                DataColumn(label: Text('PREÇO MÉDIO'), numeric: true),
-                DataColumn(label: Text('ÚLTIMA COTAÇÃO'), numeric: true),
-                DataColumn(label: Text('VALOR ATUAL'), numeric: true),
-                DataColumn(label: Text('RESULTADO'), numeric: true),
-                DataColumn(label: Text('COTAÇÃO EM')),
-              ],
-              rows: widget.positions.map((position) {
-                final gainColor = position.unrealizedGainCents >= 0
-                    ? WalletColors.accent
-                    : WalletColors.loss;
-                return DataRow(
-                  cells: [
-                    DataCell(
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: WalletColors.accent.withValues(
-                                alpha: 0.09,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              position.symbol.substring(0, 2),
-                              style: const TextStyle(
-                                color: WalletColors.accent,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                position.symbol,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                position.company,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: WalletColors.muted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+              columnSpacing: 28,
+              sortColumnIndex: columns.indexOf(_sortColumn),
+              sortAscending: _ascending,
+              columns: columns
+                  .map(
+                    (column) => DataColumn(
+                      label: Text(column.label),
+                      numeric: column.numeric,
+                      onSort: (_, ascending) => setState(() {
+                        _sortColumn = column;
+                        _ascending = ascending;
+                      }),
                     ),
-                    DataCell(Text('${position.quantity}')),
-                    DataCell(Text(formatMoney(position.averageCostCents))),
-                    DataCell(Text(formatMoney(position.quote.priceCents))),
-                    DataCell(Text(formatMoney(position.marketValueCents))),
-                    DataCell(
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            formatMoney(position.unrealizedGainCents),
-                            style: TextStyle(color: gainColor),
-                          ),
-                          Text(
-                            formatPercent(position.unrealizedGainPercent),
-                            style: TextStyle(fontSize: 12, color: gainColor),
-                          ),
-                        ],
-                      ),
+                  )
+                  .toList(),
+              rows: positions
+                  .map(
+                    (position) => DataRow(
+                      key: ValueKey(position.symbol),
+                      cells: columns
+                          .map((column) => _cell(position, column, marketValue))
+                          .toList(),
                     ),
-                    DataCell(
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            formatQuoteTime(position.quote.quotedAt),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          Text(
-                            position.quote.source,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: WalletColors.muted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                  )
+                  .toList(),
             ),
           ),
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
+
+  DataCell _cell(
+    PortfolioPosition position,
+    PositionTableColumn column,
+    int marketValue,
+  ) {
+    final text = switch (column) {
+      PositionTableColumn.symbol => position.symbol,
+      PositionTableColumn.company => position.company,
+      PositionTableColumn.quantity => '${position.quantity}',
+      PositionTableColumn.averageCost => formatMoney(position.averageCostCents),
+      PositionTableColumn.invested => formatMoney(position.investedCents),
+      PositionTableColumn.quotePrice => formatMoney(position.quote.priceCents),
+      PositionTableColumn.marketValue => formatMoney(position.marketValueCents),
+      PositionTableColumn.allocation => formatWeight(
+        position.allocationPercent(marketValue),
+      ),
+      PositionTableColumn.gain => formatMoney(position.unrealizedGainCents),
+      PositionTableColumn.gainPercent => formatPercent(
+        position.unrealizedGainPercent,
+      ),
+      PositionTableColumn.dividends => formatMoney(
+        position.dividendsReceivedCents,
+      ),
+      PositionTableColumn.totalGain => formatMoney(position.totalGainCents),
+      PositionTableColumn.totalGainPercent => formatPercent(
+        position.totalGainPercent,
+      ),
+      PositionTableColumn.quotedAt => formatQuoteTime(position.quote.quotedAt),
+      PositionTableColumn.source => position.quote.source,
+    };
+    final color = switch (column) {
+      PositionTableColumn.gain || PositionTableColumn.gainPercent =>
+        returnColor(position.unrealizedGainCents),
+      PositionTableColumn.totalGain || PositionTableColumn.totalGainPercent =>
+        returnColor(position.totalGainCents),
+      _ => null,
+    };
+    return DataCell(
+      Text(
+        text,
+        key: ValueKey('${position.symbol}-${column.name}'),
+        style: TextStyle(
+          color: color,
+          fontWeight: column == PositionTableColumn.symbol
+              ? FontWeight.w600
+              : null,
+        ),
+      ),
+    );
+  }
 }

@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../portfolio/data/sqlite_portfolio_repository.dart';
 import '../portfolio/presentation/portfolio_controller.dart';
-import '../portfolio/presentation/portfolio_page.dart';
+import 'portfolio_workspace.dart';
 import '../quotes/data/brapi_quote_provider.dart';
 
 class PortfolioBootstrap extends StatefulWidget {
@@ -67,7 +67,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   @override
   Widget build(BuildContext context) {
     if (_controller case final controller?) {
-      return PortfolioPage(controller: controller);
+      return PortfolioWorkspace(controller: controller);
     }
     return Scaffold(
       body: Center(

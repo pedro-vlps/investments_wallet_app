@@ -6,6 +6,7 @@ import 'package:investments_wallet/portfolio/domain/portfolio_totals.dart';
 import 'package:investments_wallet/portfolio/presentation/portfolio_controller.dart';
 import 'package:investments_wallet/quotes/domain/market_quote.dart';
 import 'package:investments_wallet/quotes/domain/quote_provider.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 class _Quotes implements QuoteProvider {
   int calls = 0;
@@ -61,6 +62,71 @@ void main() {
     );
     expect(PortfolioTotals([]).gainPercent, 0);
   });
+
+  test(
+    'received dividends turn the Vale price loss into a positive total return',
+    () async {
+      final vale = (await repository.loadPositions()).singleWhere(
+        (p) => p.symbol == 'VALE3',
+      );
+      expect(vale.dividendsReceivedCents, 28000);
+      expect(vale.unrealizedGainCents, -22320);
+      expect(vale.totalGainCents, 5680);
+      expect(vale.totalGainPercent, closeTo(5680 / 552000 * 100, 0.000001));
+      final positions = await repository.loadPositions();
+      final total = PortfolioTotals(positions).marketValueCents;
+      expect(
+        positions.fold<double>(0, (sum, p) => sum + p.allocationPercent(total)),
+        closeTo(100, 0.000001),
+      );
+      expect(vale.allocationPercent(0), 0);
+      await repository.initialize(demo);
+      expect(
+        (await repository.loadPositions())
+            .singleWhere((p) => p.symbol == 'VALE3')
+            .dividendsReceivedCents,
+        28000,
+      );
+    },
+  );
+
+  for (final quantity in [100, 101]) {
+    test(
+      'v1 migration preserves quotes and seeds only matching demo holdings ($quantity)',
+      () async {
+        final legacyPath = '${directory.path}/legacy-$quantity.sqlite3';
+        final database = sqlite3.open(legacyPath);
+        database.execute(
+          'CREATE TABLE positions (symbol TEXT PRIMARY KEY, company TEXT, quantity INTEGER, average_cost_cents INTEGER)',
+        );
+        database.execute(
+          'CREATE TABLE quotes (symbol TEXT PRIMARY KEY, price_cents INTEGER, quoted_at TEXT, source TEXT)',
+        );
+        database.execute('INSERT INTO positions VALUES (?, ?, ?, ?)', [
+          'PETR4',
+          'Petrobras',
+          quantity,
+          5200,
+        ]);
+        database.execute('INSERT INTO quotes VALUES (?, ?, ?, ?)', [
+          'PETR4',
+          7100,
+          '2026-10-18T12:00:00.000Z',
+          'saved quote',
+        ]);
+        database.execute('PRAGMA user_version = 1');
+        database.close();
+        final legacy = SqlitePortfolioRepository(legacyPath);
+        await legacy.initialize(demo);
+        await legacy.initialize(demo);
+        final position = (await legacy.loadPositions()).single;
+        expect(position.quantity, quantity);
+        expect(position.quote.priceCents, 7100);
+        expect(position.quote.source, 'saved quote');
+        expect(position.dividendsReceivedCents, quantity == 100 ? 32000 : 0);
+      },
+    );
+  }
 
   test('reopening never reseeds or replaces newer saved prices', () async {
     await repository.saveQuotes([

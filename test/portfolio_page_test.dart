@@ -4,13 +4,15 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'support/preview_fonts.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:investments_wallet/app/wallet_theme.dart';
+import 'package:investments_wallet/app/portfolio_workspace.dart';
 import 'package:investments_wallet/portfolio/domain/portfolio_position.dart';
 import 'package:investments_wallet/portfolio/domain/portfolio_repository.dart';
 import 'package:investments_wallet/portfolio/presentation/portfolio_controller.dart';
-import 'package:investments_wallet/portfolio/presentation/portfolio_page.dart';
+import 'package:investments_wallet/portfolio/presentation/position_table_column.dart';
+import 'package:investments_wallet/portfolio/presentation/positions_table.dart';
 import 'package:investments_wallet/quotes/domain/market_quote.dart';
 import 'package:investments_wallet/quotes/domain/quote_provider.dart';
 
@@ -31,6 +33,10 @@ class _DemoRepository implements PortfolioRepository {
             company: p['company'] as String,
             quantity: p['quantity'] as int,
             averageCostCents: p['averageCostCents'] as int,
+            dividendsReceivedCents: (demo['dividends'] as List<dynamic>)
+                .cast<Map<String, dynamic>>()
+                .where((d) => d['symbol'] == p['symbol'])
+                .fold<int>(0, (sum, d) => sum + (d['amountCents'] as int)),
             quote: MarketQuote(
               symbol: p['symbol'] as String,
               priceCents: q['priceCents'] as int,
@@ -56,23 +62,7 @@ class _OfflineProvider implements QuoteProvider {
 }
 
 void main() {
-  setUpAll(() async {
-    if (const bool.fromEnvironment('CAPTURE_PREVIEW')) {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      // Use SDK fonts for a readable, reproducible headless preview.
-      for (final font in {
-        'Segoe UI': 'roboto-regular.ttf',
-        'MaterialIcons': 'materialicons-regular.otf',
-      }.entries) {
-        final loader = FontLoader(font.key);
-        final bytes = File(
-          '.tools/flutter/bin/cache/artifacts/material_fonts/${font.value}',
-        ).readAsBytesSync();
-        loader.addFont(Future.value(ByteData.sublistView(bytes)));
-        await loader.load();
-      }
-    }
-  });
+  setUpAll(loadPreviewFonts);
   for (final width in [1440.0, 390.0]) {
     testWidgets('dark portfolio and offline refresh at width $width', (
       tester,
@@ -93,7 +83,7 @@ void main() {
           theme: buildWalletTheme(),
           home: RepaintBoundary(
             key: captureKey,
-            child: PortfolioPage(controller: controller),
+            child: PortfolioWorkspace(controller: controller),
           ),
         ),
       );
@@ -106,6 +96,62 @@ void main() {
       );
       expect(tester.takeException(), isNull);
 
+      if (width == 1440) {
+        await tester.tap(find.byTooltip('Recolher menu'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<NavigationRail>(find.byType(NavigationRail)).extended,
+          false,
+        );
+        expect(find.text('Minha carteira'), findsOneWidget);
+        await tester.tap(find.byTooltip('Expandir menu'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<NavigationRail>(find.byType(NavigationRail)).extended,
+          true,
+        );
+      }
+      await tester.tap(find.byIcon(Icons.table_chart_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text('Carteira detalhada'), findsOneWidget);
+      expect(
+        tester.widget<DataTable>(find.byType(DataTable)).columns.length,
+        PositionTableColumn.values.length,
+      );
+      expect(tester.takeException(), isNull);
+
+      for (final column in PositionTableColumn.values) {
+        final header = find.text(column.label);
+        await tester.ensureVisible(header);
+        await tester.pumpAndSettle();
+        await tester.tap(header);
+        await tester.pumpAndSettle();
+        final table = tester.widget<DataTable>(find.byType(DataTable));
+        expect(table.sortColumnIndex, column.index);
+        expect(
+          table.sortAscending,
+          column == PositionTableColumn.symbol ? false : true,
+        );
+        expect(
+          table.rows.map((row) => (row.key! as ValueKey<String>).value),
+          sortPositions(
+            controller.positions,
+            column,
+            ascending: table.sortAscending,
+          ).map((p) => p.symbol),
+        );
+        await tester.tap(header);
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<DataTable>(find.byType(DataTable)).sortAscending,
+          column == PositionTableColumn.symbol ? true : false,
+        );
+      }
+
+      // Capture the initial columns, after exercising all sortable headers.
+      await tester.ensureVisible(find.text('ATIVO'));
+      await tester.pumpAndSettle();
+
       if (width == 1440 && const bool.fromEnvironment('CAPTURE_PREVIEW')) {
         final boundary =
             captureKey.currentContext!.findRenderObject()!
@@ -115,12 +161,14 @@ void main() {
           final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
           await Directory('build').create(recursive: true);
           await File(
-            'build/portfolio-preview.png',
+            'build/portfolio-detailed-preview.png',
           ).writeAsBytes(bytes!.buffer.asUint8List());
           image.dispose();
         });
       }
 
+      await tester.ensureVisible(find.text('Atualizar cotações'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Atualizar cotações'));
       await tester.pumpAndSettle();
       expect(
@@ -131,4 +179,54 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+  testWidgets(
+    'rendered price and accumulated returns use green, red, or neutral text',
+    (tester) async {
+      final positions = [
+        for (final entry in {
+          'POSI3': 3000,
+          'NEGA3': 2000,
+          'ZERO3': 2500,
+        }.entries)
+          PortfolioPosition(
+            symbol: entry.key,
+            company: entry.key,
+            quantity: 1,
+            averageCostCents: 2500,
+            quote: MarketQuote(
+              symbol: entry.key,
+              priceCents: entry.value,
+              quotedAt: DateTime.utc(2026),
+              source: 'test',
+            ),
+          ),
+      ];
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildWalletTheme(),
+          home: Scaffold(
+            body: PositionsTable(positions: positions, detailed: true),
+          ),
+        ),
+      );
+      for (final entry in <String, Color?>{
+        'POSI3': WalletColors.accent,
+        'NEGA3': WalletColors.loss,
+        'ZERO3': null,
+      }.entries) {
+        for (final column in [
+          'gain',
+          'gainPercent',
+          'totalGain',
+          'totalGainPercent',
+        ]) {
+          final text = tester.widget<Text>(
+            find.byKey(ValueKey('${entry.key}-$column')),
+          );
+          expect(text.style?.color, entry.value);
+        }
+      }
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
