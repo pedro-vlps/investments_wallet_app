@@ -5,11 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import '../dividends/data/sqlite_dividend_repository.dart';
+import '../dividends/presentation/dividend_controller.dart';
 
 import '../portfolio/data/sqlite_portfolio_repository.dart';
 import '../portfolio/presentation/portfolio_controller.dart';
-import 'portfolio_workspace.dart';
 import '../quotes/data/brapi_quote_provider.dart';
+import 'portfolio_workspace.dart';
 
 class PortfolioBootstrap extends StatefulWidget {
   const PortfolioBootstrap({super.key});
@@ -21,6 +23,7 @@ class PortfolioBootstrap extends StatefulWidget {
 class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   final _client = http.Client();
   PortfolioController? _controller;
+  DividendController? _dividendController;
   SqlitePortfolioRepository? _repository;
   bool _failed = false;
 
@@ -48,7 +51,11 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
       );
       _repository = repository;
       _controller = controller;
-      await controller.load();
+      final dividendController = DividendController(
+        SqliteDividendRepository(repository.databasePath),
+      );
+      _dividendController = dividendController;
+      await Future.wait([controller.load(), dividendController.load()]);
       if (mounted) setState(() {});
     } catch (_) {
       if (mounted) setState(() => _failed = true);
@@ -58,6 +65,7 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   @override
   void dispose() {
     _controller?.dispose();
+    _dividendController?.dispose();
     _client.close();
     final repository = _repository;
     if (repository != null) unawaited(repository.close());
@@ -67,7 +75,10 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
   @override
   Widget build(BuildContext context) {
     if (_controller case final controller?) {
-      return PortfolioWorkspace(controller: controller);
+      return PortfolioWorkspace(
+        controller: controller,
+        dividendController: _dividendController!,
+      );
     }
     return Scaffold(
       body: Center(

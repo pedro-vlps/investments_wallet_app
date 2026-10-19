@@ -58,6 +58,17 @@ class PortfolioNavigation extends StatelessWidget {
         ),
         label: Text('Tabela detalhada'),
       ),
+      NavigationRailDestination(
+        icon: Tooltip(
+          message: 'Dividendos',
+          child: Icon(Icons.payments_outlined),
+        ),
+        selectedIcon: Tooltip(
+          message: 'Dividendos',
+          child: Icon(Icons.payments),
+        ),
+        label: Text('Dividendos'),
+      ),
     ],
   );
 }

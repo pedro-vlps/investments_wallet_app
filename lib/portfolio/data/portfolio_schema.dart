@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:sqlite3/sqlite3.dart';
+import '../../dividends/data/dividend_schema.dart';
 
 void initializePortfolioSchema(Database database, String demoJson) {
   database.execute('PRAGMA foreign_keys = ON');
@@ -8,8 +9,8 @@ void initializePortfolioSchema(Database database, String demoJson) {
   try {
     final version =
         database.select('PRAGMA user_version').single['user_version'] as int;
-    if (version > 2) throw StateError('Unsupported database schema');
-    if (version == 2) {
+    if (version > 3) throw StateError('Unsupported database schema');
+    if (version == 3) {
       database.execute('COMMIT');
       return;
     }
@@ -84,7 +85,8 @@ void initializePortfolioSchema(Database database, String demoJson) {
         );
       }
     }
-    database.execute('PRAGMA user_version = 2');
+    migrateDividendSchema(database, demo);
+    database.execute('PRAGMA user_version = 3');
     database.execute('COMMIT');
   } catch (_) {
     database.execute('ROLLBACK');

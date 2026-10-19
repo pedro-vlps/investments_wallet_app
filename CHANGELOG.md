@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.0 - 2026-10-18
+
+- Add a Dividendos workspace with independent received, total-history, and payment-table period filters.
+- Add monthly dividend bars and historical portfolio return lines with and without received dividends.
+- Fit the total-dividends chart to the available width with two return lines and adaptive date labels.
+- Add ten-row pagination, received/provisioned totals, per-share precision, entitlement dates, and dividend/JCP types.
+- Migrate local dividend records without losing prior amounts and add clearly identified fictional history and provisions.
+
 ## v0.2.0 - 2026-10-18
 
 - Add collapsible navigation between summary and detailed portfolio views.

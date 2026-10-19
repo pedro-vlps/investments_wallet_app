@@ -74,7 +74,49 @@ $env:PUB_CACHE = Join-Path (Get-Location) '.tools/pub-cache'
 & .\.tools\flutter\bin\flutter.bat run -d windows
 ```
 
-## Offline data and prices
+## Dividend workspace
+
+The Dividendos navigation item opens three independently filtered sections:
+
+- Received dividends: paid cash grouped by ticker on the left and monthly cash bars on the right.
+- Total dividends: two cumulative portfolio return lines, with and without received dividends, fitted to the available screen width without horizontal scrolling or cash columns.
+- All dividends: received and provisioned totals plus a table with at most ten rows per page, including ticker, status, kind, per-share amount, eligible quantity, total, cum date, ex date, and payment date.
+
+Every section starts at inception. The received section and table offer rolling
+1-, 3-, 6-, and 12-month windows; the total chart also offers 24 and 60 months.
+Rolling windows end today and clamp the starting day to the target month's last
+day when needed. Monthly bars can therefore contain partial first/last months.
+Empty months are retained with zero cash. The table filters by payment date;
+inception includes known future provisions, while other windows end today.
+Changing the table filter resets pagination. Filters survive navigation between views.
+
+Provisioned payments are never counted as received, and an elapsed payment date
+does not automatically mark an unconfirmed provision as received. The historical
+lines use recorded monthly market values and acquisition costs, with all received
+cash up to each valuation date for the dividend-inclusive line. Selecting a
+window displays that part of the inception-based return series; it does not
+rebase the returns. Missing valuations break the lines rather than invent prices.
+The received-dividend chart uses a BRL axis and retains horizontal scrolling for
+long histories. The total-dividends chart uses only a percentage axis and scales
+all monthly observations to its container width. Date labels become sparser for
+long periods or narrow windows; the underlying monthly points are retained.
+Bars and lines have mouse/touch tooltips. Charts have semantic
+text equivalents. None of these screens makes internet requests.
+
+All dividend events, entitlement dates, provisions, and monthly portfolio
+valuations are fictional demonstration data. Historical values are not fetched
+from brapi or reconstructed from today's price. Six decimal places are retained
+for per-share amounts using integer micro-reais; cash totals remain integer cents.
+JCP amounts in the demo are not tax calculations.
+
+Schema version 3 migrates versions 1 and 2 transactionally, preserves existing
+amounts and payment dates, and leaves unavailable entitlement/per-share fields
+unknown for non-demo records. Fixture details are only applied to matching demo
+records; sample portfolio valuations require the complete original demo holdings.
+Reopening does not duplicate payments. Portfolio totals consume the same received
+balances through the dividends persistence adapter's public contract.
+
+## Offline portfolio data and prices
 
 On first launch, the bundled `assets/demo_portfolio.json` is seeded once into
 `portfolio.sqlite3` inside the OS application support directory provided by
@@ -114,6 +156,10 @@ import are future work. Data must not be assumed recoverable after app deletion.
 - `lib/portfolio/presentation`: the portfolio controller and responsive widgets.
 - `lib/quotes/domain`: provider contract and quote values; pure Dart.
 - `lib/quotes/data`: validated brapi HTTP integration.
+- `lib/dividends/domain`: payment contracts, periods, pagination, monthly cash, and historical returns.
+- `lib/dividends/data`: dividend migrations, received balance reads, and local historical valuation reads.
+- `lib/dividends/presentation`: independent filters, paginated events, cash bars, and width-constrained return lines.
+- `lib/financial_display`: shared BRL and percentage formatting for portfolio and dividends.
 - `lib/app`: composition, application lifecycle, and the dark theme.
 
 SQLite operations run in worker isolates. Connections are scoped to operations;
@@ -136,7 +182,7 @@ persistence after reopening, schema migration, seed idempotency, atomic rollback
 stale quotes, offline refresh, duplicate refresh prevention, provider validation,
 all table sorts, navigation, return colors, and desktop/narrow layouts.
 
-Validated on Windows on 2026-10-18: all 35 tests passed, static analysis and
+Validated on Windows on 2026-10-18: all 46 tests passed, static analysis and
 formatting checks passed, and `flutter build windows --release --no-pub`
 produced `build/windows/x64/runner/Release/investments_wallet.exe`.
 Distribute the entire Release directory, including its DLLs and data folder,

@@ -1,5 +1,5 @@
 {
-  "description": "Fictional holdings, cost basis, and received dividends. Real BRL quote snapshots returned by brapi on 2026-10-17. Fees and taxes are excluded.",
+  "description": "Fictional holdings, cost basis, and received dividends. Real BRL quote snapshots returned by brapi on 2026-10-17. Fees and taxes are excluded. Dividend events, entitlement dates, future provisions, and monthly portfolio valuations are entirely fictional.",
   "positions": [
     {
       "symbol": "PETR4",
@@ -61,6 +61,612 @@
       "quotedAt": "2026-10-17T02:29:23Z",
       "source": "brapi · initial snapshot",
       "sourceUrl": "https://brapi.dev/api/quote/ITUB4"
+    }
+  ],
+  "dividendEvents": [
+    {
+      "id": "demo-petr4-20261001",
+      "symbol": "PETR4",
+      "amountCents": 32000,
+      "paidAt": "2026-10-01",
+      "perShareMicros": 3200000,
+      "quantity": 100,
+      "cumDate": "2026-09-25",
+      "exDate": "2026-09-26",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-vale3-20261002",
+      "symbol": "VALE3",
+      "amountCents": 28000,
+      "paidAt": "2026-10-02",
+      "perShareMicros": 3500000,
+      "quantity": 80,
+      "cumDate": "2026-09-26",
+      "exDate": "2026-09-27",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-itub4-20261005",
+      "symbol": "ITUB4",
+      "amountCents": 9000,
+      "paidAt": "2026-10-05",
+      "perShareMicros": 600000,
+      "quantity": 150,
+      "cumDate": "2026-09-29",
+      "exDate": "2026-09-30",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2022-3",
+      "symbol": "PETR4",
+      "amountCents": 2000,
+      "paidAt": "2022-03-10",
+      "perShareMicros": 200000,
+      "quantity": 100,
+      "cumDate": "2022-03-04",
+      "exDate": "2022-03-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2022-6",
+      "symbol": "ITUB4",
+      "amountCents": 3600,
+      "paidAt": "2022-06-10",
+      "perShareMicros": 240000,
+      "quantity": 150,
+      "cumDate": "2022-06-04",
+      "exDate": "2022-06-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2022-9",
+      "symbol": "PETR4",
+      "amountCents": 2800,
+      "paidAt": "2022-09-10",
+      "perShareMicros": 280000,
+      "quantity": 100,
+      "cumDate": "2022-09-04",
+      "exDate": "2022-09-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2022-12",
+      "symbol": "ITUB4",
+      "amountCents": 4800,
+      "paidAt": "2022-12-10",
+      "perShareMicros": 320000,
+      "quantity": 150,
+      "cumDate": "2022-12-04",
+      "exDate": "2022-12-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2023-3",
+      "symbol": "PETR4",
+      "amountCents": 3600,
+      "paidAt": "2023-03-10",
+      "perShareMicros": 360000,
+      "quantity": 100,
+      "cumDate": "2023-03-04",
+      "exDate": "2023-03-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2023-6",
+      "symbol": "ITUB4",
+      "amountCents": 6000,
+      "paidAt": "2023-06-10",
+      "perShareMicros": 400000,
+      "quantity": 150,
+      "cumDate": "2023-06-04",
+      "exDate": "2023-06-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2023-9",
+      "symbol": "PETR4",
+      "amountCents": 4400,
+      "paidAt": "2023-09-10",
+      "perShareMicros": 440000,
+      "quantity": 100,
+      "cumDate": "2023-09-04",
+      "exDate": "2023-09-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2023-12",
+      "symbol": "ITUB4",
+      "amountCents": 7200,
+      "paidAt": "2023-12-10",
+      "perShareMicros": 480000,
+      "quantity": 150,
+      "cumDate": "2023-12-04",
+      "exDate": "2023-12-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2024-3",
+      "symbol": "PETR4",
+      "amountCents": 5200,
+      "paidAt": "2024-03-10",
+      "perShareMicros": 520000,
+      "quantity": 100,
+      "cumDate": "2024-03-04",
+      "exDate": "2024-03-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2024-6",
+      "symbol": "ITUB4",
+      "amountCents": 8400,
+      "paidAt": "2024-06-10",
+      "perShareMicros": 560000,
+      "quantity": 150,
+      "cumDate": "2024-06-04",
+      "exDate": "2024-06-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2024-9",
+      "symbol": "PETR4",
+      "amountCents": 6000,
+      "paidAt": "2024-09-10",
+      "perShareMicros": 600000,
+      "quantity": 100,
+      "cumDate": "2024-09-04",
+      "exDate": "2024-09-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2024-12",
+      "symbol": "ITUB4",
+      "amountCents": 9600,
+      "paidAt": "2024-12-10",
+      "perShareMicros": 640000,
+      "quantity": 150,
+      "cumDate": "2024-12-04",
+      "exDate": "2024-12-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2025-3",
+      "symbol": "PETR4",
+      "amountCents": 6800,
+      "paidAt": "2025-03-10",
+      "perShareMicros": 680000,
+      "quantity": 100,
+      "cumDate": "2025-03-04",
+      "exDate": "2025-03-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2025-6",
+      "symbol": "ITUB4",
+      "amountCents": 10800,
+      "paidAt": "2025-06-10",
+      "perShareMicros": 720000,
+      "quantity": 150,
+      "cumDate": "2025-06-04",
+      "exDate": "2025-06-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2025-9",
+      "symbol": "PETR4",
+      "amountCents": 7600,
+      "paidAt": "2025-09-10",
+      "perShareMicros": 760000,
+      "quantity": 100,
+      "cumDate": "2025-09-04",
+      "exDate": "2025-09-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2025-12",
+      "symbol": "ITUB4",
+      "amountCents": 12000,
+      "paidAt": "2025-12-10",
+      "perShareMicros": 800000,
+      "quantity": 150,
+      "cumDate": "2025-12-04",
+      "exDate": "2025-12-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-history-2026-3",
+      "symbol": "PETR4",
+      "amountCents": 8400,
+      "paidAt": "2026-03-10",
+      "perShareMicros": 840000,
+      "quantity": 100,
+      "cumDate": "2026-03-04",
+      "exDate": "2026-03-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2026-6",
+      "symbol": "ITUB4",
+      "amountCents": 13200,
+      "paidAt": "2026-06-10",
+      "perShareMicros": 880000,
+      "quantity": 150,
+      "cumDate": "2026-06-04",
+      "exDate": "2026-06-05",
+      "kind": "DIVIDEND",
+      "received": true
+    },
+    {
+      "id": "demo-history-2026-9",
+      "symbol": "PETR4",
+      "amountCents": 9200,
+      "paidAt": "2026-09-10",
+      "perShareMicros": 920000,
+      "quantity": 100,
+      "cumDate": "2026-09-04",
+      "exDate": "2026-09-05",
+      "kind": "JCP",
+      "received": true
+    },
+    {
+      "id": "demo-provision-0",
+      "symbol": "PETR4",
+      "amountCents": 4500,
+      "paidAt": "2026-11-02",
+      "perShareMicros": 450000,
+      "quantity": 100,
+      "cumDate": "2026-10-27",
+      "exDate": "2026-10-28",
+      "kind": "DIVIDEND",
+      "received": false
+    },
+    {
+      "id": "demo-provision-1",
+      "symbol": "VALE3",
+      "amountCents": 4080,
+      "paidAt": "2026-11-09",
+      "perShareMicros": 510000,
+      "quantity": 80,
+      "cumDate": "2026-11-03",
+      "exDate": "2026-11-04",
+      "kind": "JCP",
+      "received": false
+    },
+    {
+      "id": "demo-provision-2",
+      "symbol": "ITUB4",
+      "amountCents": 8550,
+      "paidAt": "2026-12-02",
+      "perShareMicros": 570000,
+      "quantity": 150,
+      "cumDate": "2026-11-26",
+      "exDate": "2026-11-27",
+      "kind": "DIVIDEND",
+      "received": false
+    },
+    {
+      "id": "demo-provision-3",
+      "symbol": "PETR4",
+      "amountCents": 6300,
+      "paidAt": "2027-01-12",
+      "perShareMicros": 630000,
+      "quantity": 100,
+      "cumDate": "2027-01-06",
+      "exDate": "2027-01-07",
+      "kind": "JCP",
+      "received": false
+    }
+  ],
+  "valuations": [
+    {
+      "date": "2022-01-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1619500
+    },
+    {
+      "date": "2022-02-28",
+      "investedCents": 1724500,
+      "marketValueCents": 1637724
+    },
+    {
+      "date": "2022-03-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1654327
+    },
+    {
+      "date": "2022-04-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1667866
+    },
+    {
+      "date": "2022-05-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1677237
+    },
+    {
+      "date": "2022-06-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1681793
+    },
+    {
+      "date": "2022-07-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1681418
+    },
+    {
+      "date": "2022-08-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1676539
+    },
+    {
+      "date": "2022-09-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1668077
+    },
+    {
+      "date": "2022-10-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1657350
+    },
+    {
+      "date": "2022-11-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1645924
+    },
+    {
+      "date": "2022-12-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1635443
+    },
+    {
+      "date": "2023-01-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1627444
+    },
+    {
+      "date": "2023-02-28",
+      "investedCents": 1724500,
+      "marketValueCents": 1623194
+    },
+    {
+      "date": "2023-03-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1623547
+    },
+    {
+      "date": "2023-04-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1628848
+    },
+    {
+      "date": "2023-05-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1638900
+    },
+    {
+      "date": "2023-06-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1652981
+    },
+    {
+      "date": "2023-07-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1669926
+    },
+    {
+      "date": "2023-08-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1688256
+    },
+    {
+      "date": "2023-09-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1706337
+    },
+    {
+      "date": "2023-10-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1722564
+    },
+    {
+      "date": "2023-11-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1735537
+    },
+    {
+      "date": "2023-12-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1744213
+    },
+    {
+      "date": "2024-01-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1748021
+    },
+    {
+      "date": "2024-02-29",
+      "investedCents": 1724500,
+      "marketValueCents": 1746928
+    },
+    {
+      "date": "2024-03-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1741440
+    },
+    {
+      "date": "2024-04-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1732545
+    },
+    {
+      "date": "2024-05-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1721609
+    },
+    {
+      "date": "2024-06-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1710221
+    },
+    {
+      "date": "2024-07-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1700019
+    },
+    {
+      "date": "2024-08-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1692512
+    },
+    {
+      "date": "2024-09-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1688912
+    },
+    {
+      "date": "2024-10-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1690000
+    },
+    {
+      "date": "2024-11-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1696043
+    },
+    {
+      "date": "2024-12-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1706759
+    },
+    {
+      "date": "2025-01-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1721354
+    },
+    {
+      "date": "2025-02-28",
+      "investedCents": 1724500,
+      "marketValueCents": 1738608
+    },
+    {
+      "date": "2025-03-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1757006
+    },
+    {
+      "date": "2025-04-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1774908
+    },
+    {
+      "date": "2025-05-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1790728
+    },
+    {
+      "date": "2025-06-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1803110
+    },
+    {
+      "date": "2025-07-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1811077
+    },
+    {
+      "date": "2025-08-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1814137
+    },
+    {
+      "date": "2025-09-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1812338
+    },
+    {
+      "date": "2025-10-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1806263
+    },
+    {
+      "date": "2025-11-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1796967
+    },
+    {
+      "date": "2025-12-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1785858
+    },
+    {
+      "date": "2026-01-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1774544
+    },
+    {
+      "date": "2026-02-28",
+      "investedCents": 1724500,
+      "marketValueCents": 1764657
+    },
+    {
+      "date": "2026-03-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1757670
+    },
+    {
+      "date": "2026-04-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1754737
+    },
+    {
+      "date": "2026-05-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1756567
+    },
+    {
+      "date": "2026-06-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1763343
+    },
+    {
+      "date": "2026-07-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1774706
+    },
+    {
+      "date": "2026-08-31",
+      "investedCents": 1724500,
+      "marketValueCents": 1789788
+    },
+    {
+      "date": "2026-09-30",
+      "investedCents": 1724500,
+      "marketValueCents": 1807316
+    },
+    {
+      "date": "2026-10-16",
+      "investedCents": 1724500,
+      "marketValueCents": 1847830
     }
   ]
 }

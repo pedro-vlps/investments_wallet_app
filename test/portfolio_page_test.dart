@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'support/preview_fonts.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:investments_wallet/dividends/domain/dividend_repository.dart';
+import 'package:investments_wallet/dividends/presentation/dividend_controller.dart';
 import 'package:investments_wallet/app/wallet_theme.dart';
 import 'package:investments_wallet/app/portfolio_workspace.dart';
 import 'package:investments_wallet/portfolio/domain/portfolio_position.dart';
@@ -61,6 +63,12 @@ class _OfflineProvider implements QuoteProvider {
       throw const QuoteException('Sem conexão.');
 }
 
+class _EmptyDividendRepository implements DividendRepository {
+  @override
+  Future<DividendData> loadData() async =>
+      const DividendData(payments: [], valuations: []);
+}
+
 void main() {
   setUpAll(loadPreviewFonts);
   for (final width in [1440.0, 390.0]) {
@@ -77,13 +85,18 @@ void main() {
       );
       addTearDown(controller.dispose);
       await controller.load();
+      final dividendController = DividendController(_EmptyDividendRepository());
+      addTearDown(dividendController.dispose);
       final captureKey = GlobalKey();
       await tester.pumpWidget(
         MaterialApp(
           theme: buildWalletTheme(),
           home: RepaintBoundary(
             key: captureKey,
-            child: PortfolioWorkspace(controller: controller),
+            child: PortfolioWorkspace(
+              controller: controller,
+              dividendController: dividendController,
+            ),
           ),
         ),
       );

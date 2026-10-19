@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:investments_wallet/portfolio/data/sqlite_portfolio_repository.dart';
@@ -123,7 +124,14 @@ void main() {
         expect(position.quantity, quantity);
         expect(position.quote.priceCents, 7100);
         expect(position.quote.source, 'saved quote');
-        expect(position.dividendsReceivedCents, quantity == 100 ? 32000 : 0);
+        final events =
+            (jsonDecode(demo) as Map<String, dynamic>)['dividendEvents']
+                as List<dynamic>;
+        final expected = events
+            .cast<Map<String, dynamic>>()
+            .where((e) => e['symbol'] == 'PETR4' && e['received'] == true)
+            .fold<int>(0, (sum, e) => sum + (e['amountCents'] as int));
+        expect(position.dividendsReceivedCents, quantity == 100 ? expected : 0);
       },
     );
   }

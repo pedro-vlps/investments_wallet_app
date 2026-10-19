@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:sqlite3/sqlite3.dart';
+import '../../dividends/data/sqlite_dividend_repository.dart';
 
 import '../../quotes/domain/market_quote.dart';
 import '../domain/portfolio_position.dart';
@@ -26,11 +27,13 @@ class SqlitePortfolioRepository implements PortfolioRepository {
   Future<List<PortfolioPosition>> loadPositions() => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
+      final dividends = SqliteDividendRepository.receivedTotals(
+        database,
+        DateTime.now(),
+      );
       return database
           .select('''
-        SELECT p.*, q.price_cents, q.quoted_at, q.source,
-          COALESCE((SELECT SUM(d.amount_cents) FROM dividends d
-            WHERE d.symbol = p.symbol), 0) AS dividends_received_cents
+        SELECT p.*, q.price_cents, q.quoted_at, q.source
         FROM positions p JOIN quotes q ON q.symbol = p.symbol
         ORDER BY p.symbol
       ''')
@@ -39,7 +42,7 @@ class SqlitePortfolioRepository implements PortfolioRepository {
               symbol: row['symbol'] as String,
               company: row['company'] as String,
               quantity: row['quantity'] as int,
-              dividendsReceivedCents: row['dividends_received_cents'] as int,
+              dividendsReceivedCents: dividends[row['symbol']] ?? 0,
               averageCostCents: row['average_cost_cents'] as int,
               quote: MarketQuote(
                 symbol: row['symbol'] as String,

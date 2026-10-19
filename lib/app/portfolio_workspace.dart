@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import '../dividends/presentation/dividend_controller.dart';
+import '../dividends/presentation/dividend_page.dart';
 
 import '../portfolio/presentation/portfolio_controller.dart';
 import '../portfolio/presentation/portfolio_page.dart';
 import 'portfolio_navigation.dart';
 
 class PortfolioWorkspace extends StatefulWidget {
-  const PortfolioWorkspace({required this.controller, super.key});
+  const PortfolioWorkspace({
+    required this.controller,
+    required this.dividendController,
+    super.key,
+  });
   final PortfolioController controller;
+  final DividendController dividendController;
 
   @override
   State<PortfolioWorkspace> createState() => _PortfolioWorkspaceState();
@@ -34,9 +41,23 @@ class _PortfolioWorkspaceState extends State<PortfolioWorkspace> {
               ),
               const VerticalDivider(width: 1),
               Expanded(
-                child: PortfolioPage(
-                  controller: widget.controller,
-                  detailed: _selectedIndex == 1,
+                child: IndexedStack(
+                  index: _selectedIndex == 2 ? 1 : 0,
+                  children: [
+                    TickerMode(
+                      enabled: _selectedIndex != 2,
+                      child: PortfolioPage(
+                        controller: widget.controller,
+                        detailed: _selectedIndex == 1,
+                      ),
+                    ),
+                    TickerMode(
+                      enabled: _selectedIndex == 2,
+                      child: DividendPage(
+                        controller: widget.dividendController,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
