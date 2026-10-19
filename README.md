@@ -172,19 +172,16 @@ the interface and porting Dart rules; this design reduces coupling, not migratio
 ## Verification
 
 ```sh
-dart format --output=none --set-exit-if-changed lib test
+dart format --output=none --set-exit-if-changed lib
 flutter analyze
-flutter test
+flutter build windows --release
 ```
 
-Tests cover exact monetary totals, dividend-inclusive returns, portfolio weights,
-persistence after reopening, schema migration, seed idempotency, atomic rollback,
-stale quotes, offline refresh, duplicate refresh prevention, provider validation,
-all table sorts, navigation, return colors, and desktop/narrow layouts.
-
-Validated on Windows on 2026-10-18: all 46 tests passed, static analysis and
-formatting checks passed, and `flutter build windows --release --no-pub`
-produced `build/windows/x64/runner/Release/investments_wallet.exe`.
+Project test sources, the native macOS test target, synthetic examples, and
+temporary verification artifacts were removed at the developer's request.
+There is currently no automated test suite in this checkout. Verification uses
+Dart formatting, static analysis, and a Windows build; runtime behavior is not
+covered by automated regression tests.
 Distribute the entire Release directory, including its DLLs and data folder,
 rather than the executable alone. Build output is excluded from source control.
 macOS and Linux builds require their respective host environments and have not
