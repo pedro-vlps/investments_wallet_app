@@ -220,6 +220,30 @@ price. Quote refresh remains manual and available only for listed securities;
 Tesouro Direto keeps its last transaction price. Provider access may restrict
 non-demonstration tickers without a configured API subscription.
 
+Use the **Configurar cotações** settings button on either portfolio view to save,
+replace or remove a personal brapi API key. Credentials are stored using the
+operating system's secure storage and sent only to brapi in an `Authorization:
+Bearer` header. They are not embedded in source, executable assets, request URLs,
+SQLite or portable portfolio backups. Reconfigure the key on another computer.
+Without a key, the provider's public demonstration symbols remain available.
+Access, supported data, delays and request quotas still depend on the account's
+plan. Credential-store errors affect quote refresh rather than offline portfolio
+startup. Restart the desktop application after adding the secure-storage plugin;
+hot reload/restart alone does not register newly added native plugins.
+
+Linux secure storage requires `libsecret-1-dev` to build, `libsecret-1-0` to run,
+and a Secret Service keyring. macOS uses the non-shared legacy Keychain to avoid
+adding provisioning requirements to direct desktop distribution. These platforms
+have not been built or tested on this Windows host.
+
+The authenticated quote integration passed 23 isolated checks using fictitious
+credentials and a native Windows secure-store write/read verification. A live
+authenticated XPSF11 quote request also succeeded without logging the key.
+The normal Windows Release executable was rebuilt. Rebuilding the normal Debug
+executable was blocked by the developer's running application; close it before
+restarting the development launcher. The temporary setup input and verification
+scripts were removed; the API credential remains only in secure storage.
+
 The original file is stored by SHA-256 under `reports/`. Import records, normalized
 trades, and report membership are saved transactionally. Reimporting the same file
 is rejected; overlapping content is deduplicated while preserving repeated identical
@@ -249,7 +273,8 @@ builds were not run on this Windows host.
 - `lib/portfolio/data`: SQLite schema migrations, imported holdings, dividends, and atomic persistence.
 - `lib/portfolio/presentation`: the portfolio controller and responsive widgets.
 - `lib/quotes/domain`: provider contract and quote values; pure Dart.
-- `lib/quotes/data`: validated brapi HTTP integration.
+- `lib/quotes/data`: authenticated brapi HTTP integration and operating-system credential storage.
+- `lib/quotes/presentation`: masked quote-key configuration.
 - `lib/dividends/domain`: payment contracts, periods, pagination, monthly cash, and historical returns.
 - `lib/dividends/data`: dividend migrations, received balance reads, and local historical valuation reads.
 - `lib/dividends/presentation`: independent filters, paginated events, cash bars, and width-constrained return lines.

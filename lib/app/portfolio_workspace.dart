@@ -18,12 +18,14 @@ class PortfolioWorkspace extends StatefulWidget {
     required this.dividendController,
     required this.reportController,
     required this.taxController,
+    this.onConfigureQuotes,
     super.key,
   });
   final PortfolioController controller;
   final DividendController dividendController;
   final ReportController reportController;
   final TaxController taxController;
+  final VoidCallback? onConfigureQuotes;
 
   @override
   State<PortfolioWorkspace> createState() => _PortfolioWorkspaceState();
@@ -66,6 +68,7 @@ class _PortfolioWorkspaceState extends State<PortfolioWorkspace> {
                       child: PortfolioPage(
                         controller: widget.controller,
                         detailed: _selectedIndex == 1,
+                        onConfigureQuotes: widget.onConfigureQuotes,
                       ),
                     ),
                     TickerMode(

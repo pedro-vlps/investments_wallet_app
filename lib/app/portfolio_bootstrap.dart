@@ -15,6 +15,8 @@ import '../tax/presentation/tax_controller.dart';
 import '../portfolio/data/sqlite_portfolio_repository.dart';
 import '../portfolio/presentation/portfolio_controller.dart';
 import '../quotes/data/brapi_quote_provider.dart';
+import '../quotes/data/secure_quote_credentials.dart';
+import '../quotes/presentation/quote_settings_dialog.dart';
 import 'portfolio_workspace.dart';
 
 class PortfolioBootstrap extends StatefulWidget {
@@ -48,7 +50,10 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
       if (!mounted) return;
       final controller = PortfolioController(
         repository,
-        BrapiQuoteProvider(_client),
+        BrapiQuoteProvider(
+          _client,
+          credentials: const SecureQuoteCredentials(),
+        ),
       );
       _repository = repository;
       _controller = controller;
@@ -111,6 +116,11 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         dividendController: _dividendController!,
         reportController: _reportController!,
         taxController: _taxController!,
+        onConfigureQuotes: () => showDialog<void>(
+          context: context,
+          builder: (_) =>
+              const QuoteSettingsDialog(credentials: SecureQuoteCredentials()),
+        ),
       );
     }
     return Scaffold(

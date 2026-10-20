@@ -10,10 +10,12 @@ class PortfolioPage extends StatelessWidget {
   const PortfolioPage({
     required this.controller,
     this.detailed = false,
+    this.onConfigureQuotes,
     super.key,
   });
   final PortfolioController controller;
   final bool detailed;
+  final VoidCallback? onConfigureQuotes;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -49,6 +51,14 @@ class PortfolioPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (onConfigureQuotes != null)
+                          IconButton(
+                            tooltip: 'Configurar cotações',
+                            onPressed: controller.syncing
+                                ? null
+                                : onConfigureQuotes,
+                            icon: const Icon(Icons.settings_outlined),
+                          ),
                         Tooltip(
                           message:
                               'Carteira armazenada neste dispositivo. Nenhum login necessário.',

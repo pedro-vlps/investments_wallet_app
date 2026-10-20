@@ -4,13 +4,24 @@ import 'package:http/http.dart' as http;
 
 import '../domain/market_quote.dart';
 import '../domain/quote_provider.dart';
+import '../domain/quote_credentials.dart';
 
 class BrapiQuoteProvider implements QuoteProvider {
-  BrapiQuoteProvider(this._client);
+  BrapiQuoteProvider(this._client, {QuoteCredentials? credentials})
+    : _credentials = credentials;
   final http.Client _client;
+  final QuoteCredentials? _credentials;
 
   @override
   Future<List<MarketQuote>> fetchQuotes(List<String> symbols) async {
+    if (symbols.isEmpty) return const [];
+    final String? token;
+    try {
+      final stored = await _credentials?.readAccessToken();
+      token = stored == null ? null : validateQuoteAccessToken(stored);
+    } on QuoteCredentialException catch (error) {
+      throw QuoteException(error.message);
+    }
     final quotes = <MarketQuote>[];
     // One symbol per request also works with the public demonstration limits.
     for (final symbol in symbols.toSet()) {
@@ -20,6 +31,9 @@ class BrapiQuoteProvider implements QuoteProvider {
       final response = await _client
           .get(
             Uri.https('brapi.dev', '/api/v2/stocks/quote', {'symbols': symbol}),
+            headers: token == null
+                ? const {}
+                : {'Authorization': 'Bearer $token'},
           )
           .timeout(
             const Duration(seconds: 12),
@@ -31,7 +45,10 @@ class BrapiQuoteProvider implements QuoteProvider {
           );
       if (response.statusCode != 200) {
         throw QuoteException(switch (response.statusCode) {
-          401 || 403 => 'O provedor restringiu o acesso a este ativo.',
+          401 =>
+            'A chave da brapi está ausente ou foi recusada. Confira a configuração de cotações.',
+          403 =>
+            'O plano da brapi não autorizou esta consulta. Confira as permissões da chave.',
           429 => 'Limite de consultas atingido. Tente novamente mais tarde.',
           _ => 'O provedor de cotações está indisponível.',
         });

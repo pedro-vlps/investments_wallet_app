@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.7.0 - 2026-10-20
+
+- Authenticate optional brapi quote requests using a per-device API key in the Authorization header.
+- Store quote credentials in operating-system secure storage, separately from portfolio backups and application source.
+- Add masked quote-key configuration, replacement and removal from portfolio views.
+- Distinguish invalid/missing authentication from plan restrictions while preserving saved portfolio data on failures.
+
 ## v0.6.1 - 2026-10-20
 
 - Import B3 Movimentação Transferência - Liquidação credits as purchases and debits as sales instead of silently ignoring them.
