@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.0 - 2026-10-20
+
+- Add a BETA badge to the Income Tax navigation item in expanded and compact menus.
+- Display the requested development-status warning at the top of the Income Tax workspace.
+
 ## v0.8.1 - 2026-10-20
 
 - Replace editable source links with selectable text and responsive rows in the monitored tax sources panel, preserving URL copying.

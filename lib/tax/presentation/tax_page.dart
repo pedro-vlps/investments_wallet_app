@@ -30,6 +30,20 @@ class _TaxPageState extends State<TaxPage> {
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'Essa sessão ainda está sendo desenvolvida e não possui consistência nos resultados devido as fontes de cada item',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           TaxRulesCard(controller: controller),
           const SizedBox(height: 16),
           Wrap(

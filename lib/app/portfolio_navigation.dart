@@ -94,16 +94,31 @@ class PortfolioNavigation extends StatelessWidget {
         ),
         label: Text('Dividendos'),
       ),
-      const NavigationRailDestination(
+      NavigationRailDestination(
         icon: Tooltip(
-          message: 'Imposto de Renda',
-          child: Icon(Icons.receipt_long_outlined),
+          message: 'Imposto de Renda — BETA',
+          child: Badge(
+            isLabelVisible: !extended,
+            label: const Text('BETA'),
+            child: const Icon(Icons.receipt_long_outlined),
+          ),
         ),
         selectedIcon: Tooltip(
-          message: 'Imposto de Renda',
-          child: Icon(Icons.receipt_long),
+          message: 'Imposto de Renda — BETA',
+          child: Badge(
+            isLabelVisible: !extended,
+            label: const Text('BETA'),
+            child: const Icon(Icons.receipt_long),
+          ),
         ),
-        label: Text('Imposto de Renda'),
+        label: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Imposto de Renda'),
+            SizedBox(width: 8),
+            Badge(label: Text('BETA')),
+          ],
+        ),
       ),
       NavigationRailDestination(
         icon: Tooltip(
