@@ -42,18 +42,20 @@ class SqliteReportRepository implements ReportRepository {
       projectImportedHoldings(_trades(database));
 
   static List<ReportTrade> _trades(Database database) => database
-      .select('SELECT * FROM report_trades ORDER BY traded_at, id')
+      .select('SELECT * FROM report_trades ORDER BY occurred_at, id')
       .map(
         (r) => ReportTrade(
           symbol: r['symbol'] as String,
           name: r['name'] as String,
           broker: r['broker'] as String,
-          date: DateTime.parse(r['traded_at'] as String),
+          date: DateTime.parse(r['occurred_at'] as String),
           side: TradeSide.values.byName(r['side'] as String),
           quantityMicros: r['quantity_micros'] as int,
           priceMicros: r['price_micros'] as int,
           totalCents: r['total_cents'] as int,
           category: AssetCategory.values.byName(r['category'] as String),
+          dateBasis: ReportDateBasis.values.byName(r['date_basis'] as String),
+          sourceMovement: r['source_movement'] as String,
           location: 'Banco local',
         ),
       )
@@ -73,7 +75,8 @@ class SqliteReportRepository implements ReportRepository {
               '''SELECT t.symbol, MAX(t.name) name,
           SUM(CASE WHEN l.is_new = 1 AND t.side = 'buy' THEN t.quantity_micros ELSE 0 END) bought,
           SUM(CASE WHEN l.is_new = 1 AND t.side = 'sell' THEN t.quantity_micros ELSE 0 END) sold,
-          SUM(l.is_new) new_trades
+          SUM(l.is_new) new_trades,
+          SUM(CASE WHEN t.date_basis = 'settlement' THEN 1 ELSE 0 END) settlements
           FROM report_lines l JOIN report_trades t ON t.id = l.trade_id
           WHERE l.report_id = ? GROUP BY t.symbol ORDER BY t.symbol''',
               [r['id']],
@@ -94,6 +97,7 @@ class SqliteReportRepository implements ReportRepository {
                       boughtMicros: a['bought'] as int,
                       soldMicros: a['sold'] as int,
                       newTrades: a['new_trades'] as int,
+                      settlementTrades: a['settlements'] as int,
                     ),
                   )
                   .toList(),
@@ -162,6 +166,8 @@ class SqliteReportRepository implements ReportRepository {
             trade.quantityMicros,
             trade.priceMicros,
             trade.totalCents,
+            // Preserve legacy trade hashes; settlement dates are a distinct basis.
+            if (trade.dateBasis != ReportDateBasis.trade) trade.dateBasis.name,
           ]);
           final occurrence = occurrences.update(
             canonical,
@@ -219,7 +225,10 @@ class SqliteReportRepository implements ReportRepository {
         for (final (tradeId, trade, isNew) in candidates) {
           if (isNew) {
             database.execute(
-              'INSERT INTO report_trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              '''INSERT INTO report_trades
+                (id, symbol, name, broker, occurred_at, side, quantity_micros,
+                 price_micros, total_cents, category, date_basis, source_movement)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
               [
                 tradeId,
                 trade.symbol,
@@ -231,6 +240,8 @@ class SqliteReportRepository implements ReportRepository {
                 trade.priceMicros,
                 trade.totalCents,
                 trade.category!.name,
+                trade.dateBasis.name,
+                trade.sourceMovement,
               ],
             );
           }

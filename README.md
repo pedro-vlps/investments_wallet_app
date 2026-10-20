@@ -182,9 +182,10 @@ The submenu also works as labeled tooltips when the sidebar is collapsed.
 
 Supported inputs are B3 Investor Area **Negociação** and **Movimentação** XLSX
 exports and CSV files with those column names. PDF, legacy XLS, brokerage notes,
-position snapshots, corporate actions, transfers, and imported dividends are not
-supported yet. Only explicit purchases and sales affect positions. Settlement
-entries are ignored to avoid counting negotiation trades twice. Stocks, FIIs,
+position snapshots, corporate actions, unrelated transfers, and imported dividends
+are not supported yet. Explicit purchases/sales and **Transferência - Liquidação**
+affect positions: credits add purchases and debits add sales. Settlement dates
+are preserved as settlement dates, never inferred trade dates. Stocks, FIIs,
 ETFs, BDRs, and Tesouro Direto are supported. Options, futures, and other products
 are excluded with reasons shown in the review.
 
@@ -195,13 +196,21 @@ normalized to the standard code. ETF-backed BDRs such as BIVB39 are recorded as
 BDRs rather than domestic ETFs. Quantity, acquisition cost, purchases, sales,
 broker attribution, and duplicate detection follow the existing import contracts.
 
-Each imported trade records its institution/broker and asset class. Broker
+Each imported trade records its institution/broker, asset class, original movement
+label and date basis. Database schema v5 preserves existing trades as trade-date
+records. For each asset and broker, mixing trade-date and settlement-date history
+is rejected before any file or rows are saved, including when the report dates
+differ. Choose one consistent report basis; automatic reconciliation across the
+two bases is not supported because the reports lack a shared transaction ID.
+Broker
 balances and acquisition cost are maintained separately, then aggregated by asset
 for the existing portfolio tables. An incomplete history with sales exceeding
 available holdings is rejected atomically. Final `11` tickers require the user to
 choose stock/unit, FII, ETF, or ignore when the file supplies no classification.
 Imported cost excludes brokerage fees and taxes. Full daily exports are needed
 to distinguish repeated identical fills consistently across overlapping files.
+Product descriptions explicitly identifying FII or ETF can resolve the class;
+otherwise ambiguous final-11 tickers still require review.
 
 After the first successful import, portfolio views use only imported holdings;
 older portfolio and dividend records are preserved in SQLite but hidden. Imported dividends and historical
@@ -217,9 +226,22 @@ is rejected; overlapping content is deduplicated while preserving repeated ident
 rows within a report. Processing and persistence run in worker isolates.
 
 Import layouts were researched using [B3 instructional material](https://www.b3.com.br/data/files/15/64/1A/AD/CDD8F710C3D7B7F7AC094EA8/Material_IR22_Area_logada_v4.pdf)
-and public anonymized structural examples. Synthetic upload examples and their
-generator have been removed from the project. No authenticated current investor
-export was available for validation.
+and public anonymized structural examples. An actual Investor Area Movimentação
+XLSX supplied by the developer on 2026-10-20 was used to reproduce the previously
+ignored settlement entry and validate parsing and persistence. The personal file
+is not included in the repository. Synthetic upload examples and their generator
+have been removed from the project.
+
+The settlement correction passed 42 focused checks using isolated databases,
+including exact reconciliation against an independent XML/decimal extraction,
+schema-v4 migration, legacy duplicate identifiers, repeated files, overlapping
+rows, source-basis conflicts and sale balances. The native Windows workspace was
+also exercised through preview, classification, import, report listing, portfolio
+reload and duplicate rejection at wide and compact widths. File selection was
+injected with the supplied local path; the operating-system dialog was not
+automated. Validation scripts, archived personal-file copies, databases and
+screenshots were temporary and removed after verification. macOS/Linux native
+builds were not run on this Windows host.
 
 ## Context boundaries and technology changes
 

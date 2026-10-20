@@ -21,7 +21,7 @@ String normalizeB3ListedSymbol(String value) {
 AssetCategory? classifyB3ListedAsset(String symbol, String categoryText) {
   // ETF-backed receipts remain BDRs even when the sheet mentions ETFs.
   if (isB3BdrSymbol(symbol)) return AssetCategory.bdr;
-  if (categoryText.contains('etf')) return AssetCategory.etf;
+  if (RegExp(r'\betf\b').hasMatch(categoryText)) return AssetCategory.etf;
   if (categoryText.contains('imobili') ||
       RegExp(r'\bfii\b').hasMatch(categoryText)) {
     return AssetCategory.realEstateFund;

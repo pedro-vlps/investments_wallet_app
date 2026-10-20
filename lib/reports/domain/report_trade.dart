@@ -2,6 +2,8 @@ import '../../portfolio/domain/asset_category.dart';
 
 enum TradeSide { buy, sell }
 
+enum ReportDateBasis { trade, settlement }
+
 class ReportTrade {
   const ReportTrade({
     required this.symbol,
@@ -14,6 +16,8 @@ class ReportTrade {
     required this.totalCents,
     required this.location,
     this.category,
+    this.dateBasis = ReportDateBasis.trade,
+    this.sourceMovement = '',
   });
 
   final String symbol;
@@ -26,6 +30,8 @@ class ReportTrade {
   final int totalCents;
   final String location;
   final AssetCategory? category;
+  final ReportDateBasis dateBasis;
+  final String sourceMovement;
 
   ReportTrade classified(AssetCategory value) => ReportTrade(
     symbol: symbol,
@@ -38,6 +44,8 @@ class ReportTrade {
     totalCents: totalCents,
     location: location,
     category: value,
+    dateBasis: dateBasis,
+    sourceMovement: sourceMovement,
   );
 }
 

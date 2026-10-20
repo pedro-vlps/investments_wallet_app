@@ -3,6 +3,7 @@ import 'package:sqlite3/sqlite3.dart';
 import '../../quotes/domain/market_quote.dart';
 import '../../reports/data/sqlite_report_repository.dart';
 import '../../reports/domain/imported_holding.dart';
+import '../../reports/domain/report_trade.dart';
 import '../domain/portfolio_position.dart';
 
 List<PortfolioPosition> loadImportedPortfolioPositions(Database database) {
@@ -49,6 +50,8 @@ List<PortfolioPosition> loadImportedPortfolioPositions(Database database) {
               : latest.date,
           source: useSaved
               ? saved['source'] as String
+              : latest.dateBasis == ReportDateBasis.settlement
+              ? 'Preço da última liquidação · sem cotação atual'
               : 'Preço da última operação · sem cotação atual',
         ),
       );

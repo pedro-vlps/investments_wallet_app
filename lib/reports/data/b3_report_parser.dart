@@ -153,13 +153,30 @@ class B3ReportParser {
         final movement = normalizeB3Text(
           cell(negotiation ? 'tipo de movimentacao' : 'movimentacao'),
         );
-        if (movement != 'compra' && movement != 'venda') {
+        final settlement =
+            !negotiation &&
+            RegExp(r'^transferencia\s*[-–—]\s*liquidacao$').hasMatch(movement);
+        final direction = normalizeB3Text(cell('entrada/saida'));
+        final TradeSide side;
+        if (settlement) {
+          if (['credito', 'entrada'].contains(direction)) {
+            side = TradeSide.buy;
+          } else if (['debito', 'saida'].contains(direction)) {
+            side = TradeSide.sell;
+          } else {
+            throw ReportImportException(
+              '$location: entrada/saída inválida para liquidação. Nenhuma linha deste arquivo foi gravada.',
+            );
+          }
+        } else if (movement == 'compra') {
+          side = TradeSide.buy;
+        } else if (movement == 'venda') {
+          side = TradeSide.sell;
+        } else {
           issues.add(
             ReportIssue(
               location,
-              movement == 'transferencia - liquidacao'
-                  ? 'Liquidação ignorada: use Negociação para evitar contar a mesma compra duas vezes.'
-                  : 'Evento não importado: ${string(negotiation ? 'tipo de movimentacao' : 'movimentacao')}.',
+              'Evento não importado: ${string(negotiation ? 'tipo de movimentacao' : 'movimentacao')}.',
             ),
           );
           continue;
@@ -204,7 +221,7 @@ class B3ReportParser {
           continue;
         }
         final categoryText = normalizeB3Text(
-          '${string('tipo de produto')} ${string('tipo de ativo')} ${table.key}',
+          '${string('tipo de produto')} ${string('tipo de ativo')} ${table.key} $product',
         );
         final category = treasury
             ? AssetCategory.treasury
@@ -234,8 +251,7 @@ class B3ReportParser {
             throw const FormatException('Inconsistent total');
           }
           if (!negotiation) {
-            final direction = normalizeB3Text(cell('entrada/saida'));
-            final valid = movement == 'compra'
+            final valid = side == TradeSide.buy
                 ? ['credito', 'entrada']
                 : ['debito', 'saida'];
             if (!valid.contains(direction)) {
@@ -248,12 +264,18 @@ class B3ReportParser {
               name: product,
               broker: broker,
               date: parseB3Date(cell(negotiation ? 'data do negocio' : 'data')),
-              side: movement == 'compra' ? TradeSide.buy : TradeSide.sell,
+              side: side,
               quantityMicros: quantity,
               priceMicros: price,
               totalCents: total,
               location: location,
               category: category,
+              dateBasis: settlement
+                  ? ReportDateBasis.settlement
+                  : ReportDateBasis.trade,
+              sourceMovement: string(
+                negotiation ? 'tipo de movimentacao' : 'movimentacao',
+              ),
             ),
           );
         } on FormatException {

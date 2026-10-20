@@ -41,6 +41,7 @@ Map<String, Object?> buildTaxAnnualReport({
       'Not a complete DIRPF, PGD import file, DARF or transmission receipt.',
       'Monthly results are manually reconciled across all brokers for one resident CPF.',
       'Imported trades omit fees, IRRF, corporate actions, initial tax costs and income statements.',
+      'Settlement movements retain their settlement date, not an inferred trade date. Reconcile the actual trade date and fiscal year before declaring.',
       'Review acquisition costs on December 31 in both years, taxpayer data, CNPJ, income and other assets in the official declaration.',
       'Treasury and fixed-income ETFs: source withholding and statements, not DARF 6015.',
       'Dividend, JCP, FII distribution and BDR income must follow issuer statements and their own tax regimes.',
@@ -89,6 +90,8 @@ Map<String, Object?> buildTaxAnnualReport({
       for (final t in trades.where((t) => t.date.year == year))
         {
           'date': t.date.toIso8601String(),
+          'dateBasis': t.dateBasis.name,
+          'sourceMovement': t.sourceMovement,
           'symbol': t.symbol,
           'broker': t.broker,
           'side': t.side.name,

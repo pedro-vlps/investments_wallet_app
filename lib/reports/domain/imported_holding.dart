@@ -2,11 +2,18 @@ import '../../portfolio/domain/asset_category.dart';
 import 'report_trade.dart';
 
 class ImportedHolding {
-  ImportedHolding(this.symbol, this.name, this.category, this.broker);
+  ImportedHolding(
+    this.symbol,
+    this.name,
+    this.category,
+    this.broker, {
+    this.dateBasis = ReportDateBasis.trade,
+  });
   final String symbol;
   final String name;
   final AssetCategory category;
   final String broker;
+  final ReportDateBasis dateBasis;
   int quantityMicros = 0;
   int costCents = 0;
   int lastPriceMicros = 0;
@@ -48,11 +55,19 @@ List<ImportedHolding> projectImportedHoldings(Iterable<ReportTrade> trades) {
         trade.name,
         trade.category!,
         trade.broker,
+        dateBasis: trade.dateBasis,
       ),
     );
     if (holding.category != trade.category) {
       throw ReportImportException(
         'Classificações conflitantes para ${trade.symbol}.',
+      );
+    }
+    if (holding.dateBasis != trade.dateBasis) {
+      throw ReportImportException(
+        'O histórico de ${trade.symbol} nesta instituição já usa outra base de data. '
+        'Use somente negociações ou somente liquidações para o mesmo ativo e instituição, '
+        'para não contar a mesma operação duas vezes. A data de liquidação não é a data do negócio.',
       );
     }
     if (trade.side == TradeSide.buy) {

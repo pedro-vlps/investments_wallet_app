@@ -30,8 +30,9 @@ class ReportUploadPage extends StatelessWidget {
         const SizedBox(height: 12),
         const Text(
           'Compras e vendas de ações, FIIs, ETFs, BDRs e Tesouro Direto. '
-          'Opções, futuros e outros produtos são ignorados. Liquidações, proventos, '
-          'transferências e eventos corporativos não alteram a carteira nesta versão. '
+          'Transferência - Liquidação com crédito registra compra e com débito registra venda, pela data de liquidação. '
+          'Opções, futuros e outros produtos são ignorados. Proventos, '
+          'outras transferências e eventos corporativos não alteram a carteira nesta versão. '
           'Importe todo o histórico de compras e vendas; vendas sem saldo serão bloqueadas. '
           'PDF, XLS e relatórios de Posição ainda não são aceitos.',
         ),
@@ -75,6 +76,18 @@ class ReportUploadPage extends StatelessWidget {
             '${report.layouts.join(' / ')} · ${report.trades.length} operação(ões) elegível(is)',
           ),
           const SizedBox(height: 8),
+          if (report.trades.any(
+            (trade) => trade.dateBasis == ReportDateBasis.settlement,
+          ))
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                'Este arquivo usa data de liquidação, não a data do negócio. '
+                'Para o mesmo ativo e instituição, use somente negociações ou somente liquidações; '
+                'misturar as duas bases é bloqueado para evitar duplicar a carteira. '
+                'A data do negócio deve ser conferida para a apuração fiscal.',
+              ),
+            ),
           const Text(
             'Confira as quantidades compradas e vendidas abaixo. Operações repetidas em arquivos com períodos sobrepostos não serão contadas novamente. '
             'Preços de operações não são cotações atuais; o preço médio não inclui corretagem, taxas ou impostos.',

@@ -18,6 +18,13 @@ costs. The form records signed results, actual withholding, payments and notes.
 Day-trade classification must be reconciled from broker notes, not inferred from
 daily aggregate B3 rows without execution order.
 
+B3 Movimentação settlement entries may now feed portfolio quantities. Their
+original movement label and settlement date basis are retained in SQLite and
+annual reconciliation exports. A settlement date is not an inferred trade date;
+the actual trade date and fiscal reporting year must be reconciled separately.
+The importer rejects mixing settlement and trade-date histories for the same
+asset/broker because these exports have no shared transaction identifier.
+
 - Eligible ordinary stock sales: monthly gross sales up to BRL 20,000 exempt
   positive stock results. Above this amount, the entire stock result is taxable.
   ETFs, BDRs, FIIs and day trades do not receive this exemption. Exempt gains do

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.1 - 2026-10-20
+
+- Import B3 Movimentação Transferência - Liquidação credits as purchases and debits as sales instead of silently ignoring them.
+- Recognize explicit FII/ETF product descriptions and preserve the original movement label and settlement date basis in database schema v5.
+- Reject mixed negotiation/settlement histories for the same asset and broker to prevent duplicate holdings without guessing trade dates.
+- Identify settlement records in upload review, report management, price captions and auxiliary fiscal exports.
+- Validate the importer against an actual developer-supplied B3 XLSX without including personal financial data in the repository.
+
 ## v0.6.0 - 2026-10-19
 
 - Add an Income Tax workspace before Reports with monthly assisted assessments, hypothetical planning, and seasonal auxiliary annual reports.

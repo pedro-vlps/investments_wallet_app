@@ -24,12 +24,14 @@ class ReportAssetSummary {
     required this.boughtMicros,
     required this.soldMicros,
     required this.newTrades,
+    this.settlementTrades = 0,
   });
   final String symbol;
   final String name;
   final int boughtMicros;
   final int soldMicros;
   final int newTrades;
+  final int settlementTrades;
 }
 
 class StoredReport {

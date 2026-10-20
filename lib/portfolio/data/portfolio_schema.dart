@@ -8,8 +8,8 @@ void initializePortfolioSchema(Database database) {
   try {
     final version =
         database.select('PRAGMA user_version').single['user_version'] as int;
-    if (version > 4) throw StateError('Unsupported database schema');
-    if (version == 4) {
+    if (version > 5) throw StateError('Unsupported database schema');
+    if (version == 5) {
       database.execute('COMMIT');
       return;
     }
@@ -41,7 +41,7 @@ void initializePortfolioSchema(Database database) {
     }
     if (version < 3) migrateDividendSchema(database);
     initializeReportSchema(database);
-    database.execute('PRAGMA user_version = 4');
+    database.execute('PRAGMA user_version = 5');
     database.execute('COMMIT');
   } catch (_) {
     database.execute('ROLLBACK');

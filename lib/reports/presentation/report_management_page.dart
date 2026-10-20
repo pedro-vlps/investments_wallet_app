@@ -78,6 +78,13 @@ class ReportManagementPage extends StatelessWidget {
                       'Vendas adicionadas: ${formatReportQuantity(asset.soldMicros)} · ${asset.newTrades} operação(ões) nova(s)',
                     ),
                   ),
+                if (report.assets.any((asset) => asset.settlementTrades > 0))
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Contém movimentações por data de liquidação. A data do negócio não foi informada neste arquivo.',
+                    ),
+                  ),
                 Text(
                   '${report.duplicateTrades} operação(ões) repetida(s), sem adicionar saldo novamente.',
                 ),
