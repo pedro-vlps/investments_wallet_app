@@ -116,14 +116,18 @@ class DividendReport {
           receivedCents: cash,
           priceReturnPercent: snapshot == null
               ? null
-              : (snapshot.marketValueCents - snapshot.investedCents) /
-                    snapshot.investedCents *
-                    100,
+              : snapshot.priceReturnPercent ??
+                    (snapshot.marketValueCents - snapshot.investedCents) /
+                        snapshot.investedCents *
+                        100,
           totalReturnPercent: snapshot == null
               ? null
-              : (snapshot.marketValueCents - snapshot.investedCents + allCash) /
-                    snapshot.investedCents *
-                    100,
+              : snapshot.totalReturnPercent ??
+                    (snapshot.marketValueCents -
+                            snapshot.investedCents +
+                            allCash) /
+                        snapshot.investedCents *
+                        100,
         ),
       );
     }

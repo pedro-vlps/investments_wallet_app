@@ -1,4 +1,10 @@
-enum DividendKind { dividend, interestOnEquity }
+enum DividendKind { dividend, interestOnEquity, fundIncome }
+
+String dividendKindLabel(DividendKind kind) => switch (kind) {
+  DividendKind.dividend => 'Dividendo',
+  DividendKind.interestOnEquity => 'JCP',
+  DividendKind.fundIncome => 'Rendimento',
+};
 
 class DividendPayment {
   DividendPayment({
@@ -12,6 +18,7 @@ class DividendPayment {
     this.eligibleQuantity,
     this.cumDate,
     this.exDate,
+    this.estimated = false,
   }) {
     if (id.isEmpty ||
         symbol.isEmpty ||
@@ -33,4 +40,5 @@ class DividendPayment {
   final int? eligibleQuantity;
   final DateTime? cumDate;
   final DateTime? exDate;
+  final bool estimated;
 }

@@ -35,7 +35,8 @@ class ReportController extends ChangeNotifier {
   bool get canImport =>
       !busy &&
       preview != null &&
-      preview!.trades.any((t) => !excludedSymbols.contains(t.symbol)) &&
+      (preview!.dividends.isNotEmpty ||
+          preview!.trades.any((t) => !excludedSymbols.contains(t.symbol))) &&
       preview!.trades.every(
         (t) =>
             excludedSymbols.contains(t.symbol) ||
@@ -126,6 +127,7 @@ class ReportController extends ChangeNotifier {
         name: fileName!,
         bytes: _bytes!,
         report: ParsedReport(
+          dividends: source.dividends,
           trades: trades,
           issues: [
             ...source.issues,

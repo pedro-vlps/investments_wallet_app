@@ -8,11 +8,13 @@ import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../portfolio/domain/asset_category.dart';
+import '../../dividends/data/reported_dividend_store.dart';
 import '../domain/imported_holding.dart';
 import '../domain/report_document.dart';
 import '../domain/report_repository.dart';
 import '../domain/report_trade.dart';
 import 'report_schema.dart';
+import 'report_dividend_backfill.dart';
 
 class SqliteReportRepository implements ReportRepository {
   const SqliteReportRepository(this.databasePath, this.reportDirectory);
@@ -23,7 +25,7 @@ class SqliteReportRepository implements ReportRepository {
   Future<List<ReportTrade>> listTrades() => Isolate.run(() {
     final database = sqlite3.open(databasePath, mode: OpenMode.readOnly);
     try {
-      return hasReports(database) ? _trades(database) : <ReportTrade>[];
+      return hasReports(database) ? readTrades(database) : <ReportTrade>[];
     } finally {
       database.close();
     }
@@ -39,9 +41,9 @@ class SqliteReportRepository implements ReportRepository {
       database.select('SELECT 1 FROM imported_reports LIMIT 1').isNotEmpty;
 
   static List<ImportedHolding> holdings(Database database) =>
-      projectImportedHoldings(_trades(database));
+      projectImportedHoldings(readTrades(database));
 
-  static List<ReportTrade> _trades(Database database) => database
+  static List<ReportTrade> readTrades(Database database) => database
       .select('SELECT * FROM report_trades ORDER BY occurred_at, id')
       .map(
         (r) => ReportTrade(
@@ -66,6 +68,7 @@ class SqliteReportRepository implements ReportRepository {
     final database = sqlite3.open(databasePath);
     try {
       initializeReportSchema(database);
+      backfillReportDividends(database, reportDirectory);
       return database
           .select(
             'SELECT * FROM imported_reports ORDER BY imported_at DESC, id',
@@ -89,6 +92,18 @@ class SqliteReportRepository implements ReportRepository {
               importedAt: DateTime.parse(r['imported_at'] as String),
               relativePath: r['relative_path'] as String,
               duplicateTrades: r['duplicate_trades'] as int,
+              dividendCount:
+                  database.select(
+                        'SELECT COUNT(*) n FROM report_dividend_lines WHERE report_id = ? AND is_new = 1',
+                        [r['id']],
+                      ).single['n']
+                      as int,
+              duplicateDividends:
+                  database.select(
+                        'SELECT COUNT(*) n FROM report_dividend_lines WHERE report_id = ? AND is_new = 0',
+                        [r['id']],
+                      ).single['n']
+                      as int,
               assets: assets
                   .map(
                     (a) => ReportAssetSummary(
@@ -122,9 +137,9 @@ class SqliteReportRepository implements ReportRepository {
     required Uint8List bytes,
     required ParsedReport report,
   }) => Isolate.run(() {
-    if (report.trades.isEmpty) {
+    if (report.trades.isEmpty && report.dividends.isEmpty) {
       throw const ReportImportException(
-        'Nenhuma compra ou venda elegível neste relatório.',
+        'Nenhuma operação ou provento elegível neste relatório.',
       );
     }
     final extension = path.extension(name).toLowerCase();
@@ -192,7 +207,7 @@ class SqliteReportRepository implements ReportRepository {
         }
         // Validate the full rebuilt timeline before writing either the file or rows.
         projectImportedHoldings([
-          ..._trades(database),
+          ...readTrades(database),
           ...candidates.where((c) => c.$3).map((c) => c.$2),
         ]);
         Directory(reportDirectory).createSync(recursive: true);
@@ -251,6 +266,7 @@ class SqliteReportRepository implements ReportRepository {
             isNew ? 1 : 0,
           ]);
         }
+        ReportedDividendStore.save(database, id, report.dividends);
         database.execute('COMMIT');
       } catch (_) {
         database.execute('ROLLBACK');

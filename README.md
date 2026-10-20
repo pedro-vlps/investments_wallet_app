@@ -24,8 +24,9 @@ value and portfolio weight. Every displayed column is sortable.
 
 Returns are simple, non-annualized, and exclude taxes and fees; dividends are not
 automatically reinvested or compounded. Positive returns are green, negative
-returns are red, and exact zero uses the default text color. Only quote prices
-are fetched from brapi; dividend data is not downloaded automatically.
+returns are red, and exact zero uses the default text color. Optional brapi
+updates also retrieve announcements and original daily prices for the separate
+dividend workspace, subject to provider permissions.
 
 ## Run
 
@@ -97,9 +98,11 @@ inception includes known future provisions, while other windows end today.
 Changing the table filter resets pagination. Filters survive navigation between views.
 
 Provisioned payments are never counted as received, and an elapsed payment date
-does not automatically mark an unconfirmed provision as received. The historical
-lines use recorded monthly market values and acquisition costs, with all received
-cash up to each valuation date for the dividend-inclusive line. Selecting a
+does not automatically mark an unconfirmed provision as received. For imported
+portfolios, historical lines chain daily returns from original closes and
+negotiation quantities, with confirmed cash in the income-inclusive line.
+Purchases are treated as beginning-of-day flows and sales as end-of-day flows;
+the income-inclusive chain represents theoretical reinvestment. Selecting a
 window displays that part of the inception-based return series; it does not
 rebase the returns. Missing valuations break the lines rather than invent prices.
 The received-dividend chart uses a BRL axis and retains horizontal scrolling for
@@ -107,10 +110,16 @@ long histories. The total-dividends chart uses only a percentage axis and scales
 all monthly observations to its container width. Date labels become sparser for
 long periods or narrow windows; the underlying monthly points are retained.
 Bars and lines have mouse/touch tooltips. Charts have semantic
-text equivalents. None of these screens makes internet requests.
+text equivalents. Saved data remains available without internet access.
 
-Dividend events and monthly portfolio valuations are not created automatically.
-Historical values are not fetched from brapi or reconstructed from today's price.
+Dividend/JCP/income credits are imported automatically from B3 movement reports,
+including archived originals previously processed by the app. Announcements and
+daily prices update on entering the screen when stale, after imports, or through
+the refresh button. Missing dates, unsupported corporate actions, settlement-only
+histories and unavailable original closes prevent invented entitlement/return
+calculations. Provider announcements remain gross estimates until a report
+confirms payment. See [Dividend data](docs/dividend-data.md) for the calculation,
+reconciliation rules, API plan requirements and remaining coverage limits.
 Six decimal places are retained for per-share amounts using integer micro-reais;
 cash totals remain integer cents.
 
@@ -119,6 +128,8 @@ amounts and payment dates, and leaves unavailable entitlement/per-share fields
 unknown when the original records do not contain those details.
 Reopening does not duplicate payments. Portfolio totals consume the same received
 balances through the dividends persistence adapter's public contract.
+Schema version 6 adds separate reported-credit storage and report provenance,
+without requiring imported symbols to exist in the legacy position table.
 
 ## Offline portfolio data and prices
 
@@ -182,7 +193,7 @@ The submenu also works as labeled tooltips when the sidebar is collapsed.
 
 Supported inputs are B3 Investor Area **Negociação** and **Movimentação** XLSX
 exports and CSV files with those column names. PDF, legacy XLS, brokerage notes,
-position snapshots, corporate actions, unrelated transfers, and imported dividends
+position snapshots, corporate actions and unrelated transfers
 are not supported yet. Explicit purchases/sales and **Transferência - Liquidação**
 affect positions: credits add purchases and debits add sales. Settlement dates
 are preserved as settlement dates, never inferred trade dates. Stocks, FIIs,
@@ -213,8 +224,8 @@ Product descriptions explicitly identifying FII or ETF can resolve the class;
 otherwise ambiguous final-11 tickers still require review.
 
 After the first successful import, portfolio views use only imported holdings;
-older portfolio and dividend records are preserved in SQLite but hidden. Imported dividends and historical
-return charts will need their own implementation. New positions initially show
+older position records are preserved in SQLite but hidden. Dividend reads combine
+recorded legacy cash credits with imported credits. New positions initially show
 the last transaction price and its date, explicitly labeled as a transaction
 price. Quote refresh remains manual and available only for listed securities;
 Tesouro Direto keeps its last transaction price. Provider access may restrict

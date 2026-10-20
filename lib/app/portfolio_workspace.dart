@@ -53,6 +53,9 @@ class _PortfolioWorkspaceState extends State<PortfolioWorkspace> {
                 onSelected: (index) {
                   setState(() => _selectedIndex = index);
                   if (index == 3) unawaited(widget.taxController.checkRules());
+                  if (index == 2) {
+                    unawaited(widget.dividendController.refreshIfStale());
+                  }
                 },
                 onToggle: canExtend
                     ? () => setState(() => _extended = !_extended)

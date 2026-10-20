@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../dividends/data/sqlite_dividend_repository.dart';
 import '../dividends/presentation/dividend_controller.dart';
+import '../dividends/data/brapi_dividend_provider.dart';
+import '../dividends/data/dividend_synchronizer.dart';
 import '../app_storage/open_wallet_storage.dart';
 import '../reports/data/sqlite_report_repository.dart';
 import '../reports/presentation/report_controller.dart';
@@ -65,6 +67,11 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
         storage.databasePath,
         storage.reportDirectory,
       );
+      dividendController.synchronizeMarket = DividendSynchronizer(
+        storage.databasePath,
+        reportRepository,
+        BrapiDividendProvider(_client, const SecureQuoteCredentials()),
+      ).synchronize;
       final taxController = TaxController(
         SqliteTaxRepository(storage.databasePath),
         reportRepository,
@@ -81,13 +88,14 @@ class _PortfolioBootstrapState extends State<PortfolioBootstrap> {
             dividendController.load(),
             taxController.loadYear(taxController.year),
           ]);
+          unawaited(dividendController.synchronize());
         },
       );
       _reportController = reportController;
+      await reportController.load();
       await Future.wait([
         controller.load(),
         dividendController.load(),
-        reportController.load(),
         taxController.initialize(),
       ]);
       if (mounted) setState(() {});

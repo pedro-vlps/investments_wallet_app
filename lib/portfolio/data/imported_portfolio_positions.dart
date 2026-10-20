@@ -1,12 +1,17 @@
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../quotes/domain/market_quote.dart';
+import '../../dividends/data/sqlite_dividend_repository.dart';
 import '../../reports/data/sqlite_report_repository.dart';
 import '../../reports/domain/imported_holding.dart';
 import '../../reports/domain/report_trade.dart';
 import '../domain/portfolio_position.dart';
 
 List<PortfolioPosition> loadImportedPortfolioPositions(Database database) {
+  final dividends = SqliteDividendRepository.receivedTotals(
+    database,
+    DateTime.now(),
+  );
   final grouped = <String, List<ImportedHolding>>{};
   for (final holding in SqliteReportRepository.holdings(database)) {
     grouped.putIfAbsent(holding.symbol, () => []).add(holding);
@@ -37,6 +42,7 @@ List<PortfolioPosition> loadImportedPortfolioPositions(Database database) {
         costBasisCents: cost,
         category: latest.category,
         imported: true,
+        dividendsReceivedCents: dividends[entry.key] ?? 0,
         quote: MarketQuote(
           symbol: entry.key,
           priceCents: useSaved

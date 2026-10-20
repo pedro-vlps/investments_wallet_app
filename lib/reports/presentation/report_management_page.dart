@@ -67,6 +67,9 @@ class ReportManagementPage extends StatelessWidget {
               childrenPadding: const EdgeInsets.all(16),
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  '${report.dividendCount} provento(s) adicionado(s) · ${report.duplicateDividends} provento(s) repetido(s).',
+                ),
                 for (final asset in report.assets)
                   ListTile(
                     contentPadding: EdgeInsets.zero,

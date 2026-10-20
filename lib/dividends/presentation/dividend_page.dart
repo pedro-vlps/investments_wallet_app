@@ -10,6 +10,7 @@ import 'dividend_period_picker.dart';
 import 'dividend_section.dart';
 import 'monthly_dividend_chart.dart';
 import 'portfolio_return_chart.dart';
+import 'dividend_announcements_list.dart';
 
 class DividendPage extends StatefulWidget {
   const DividendPage({required this.controller, super.key});
@@ -101,11 +102,48 @@ class _DividendPageState extends State<DividendPage> {
                   key: ValueKey('dividends-title'),
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
                 ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FilledButton.icon(
+                    onPressed: controller.syncing
+                        ? null
+                        : controller.synchronize,
+                    icon: controller.syncing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.sync),
+                    label: Text(
+                      controller.syncing
+                          ? 'Atualizando…'
+                          : 'Atualizar proventos e histórico',
+                    ),
+                  ),
+                ),
+                if (controller.syncMessage case final message?) Text(message),
+                if (controller.data.checkedAt case final checked?)
+                  Text(
+                    'Última tentativa de consulta: ${formatDividendDate(checked)}',
+                  ),
+                ...controller.data.warnings.map(
+                  (warning) => Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      warning,
+                      style: const TextStyle(color: WalletColors.muted),
+                    ),
+                  ),
+                ),
                 if (!controller.data.demo) ...[
                   const SizedBox(height: 12),
                   const Text(
-                    'Sua carteira usa relatórios importados. A importação de proventos e do histórico de rentabilidade '
-                    'ainda não está disponível. Os dados fictícios foram ocultados.',
+                    'Recebidos são créditos confirmados nos relatórios. Previsões da API são estimativas brutas, '
+                    'sem descontar impostos ou taxas; datas e valores ausentes não são estimados. '
+                    'A rentabilidade usa fechamentos originais, compras no início do dia e vendas no fim do dia, '
+                    'com reinvestimento teórico dos proventos confirmados na linha com dividendos.',
                     style: TextStyle(
                       color: WalletColors.muted,
                       fontSize: 13,
@@ -113,6 +151,11 @@ class _DividendPageState extends State<DividendPage> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 24),
+                DividendAnnouncementsList(
+                  announcements: controller.data.announcements,
+                  asOf: controller.asOf,
+                ),
                 const SizedBox(height: 24),
                 DividendSection(
                   title: 'Dividendos recebidos',

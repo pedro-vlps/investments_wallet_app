@@ -1,4 +1,5 @@
 import 'package:sqlite3/sqlite3.dart';
+import '../../dividends/data/reported_dividend_store.dart';
 
 void initializeReportSchema(Database database) {
   database.execute('''CREATE TABLE IF NOT EXISTS imported_reports (
@@ -39,4 +40,5 @@ void initializeReportSchema(Database database) {
   database.execute('''CREATE TABLE IF NOT EXISTS imported_quotes (
     symbol TEXT PRIMARY KEY, price_cents INTEGER NOT NULL CHECK(price_cents > 0),
     quoted_at TEXT NOT NULL, source TEXT NOT NULL)''');
+  ReportedDividendStore.initialize(database);
 }

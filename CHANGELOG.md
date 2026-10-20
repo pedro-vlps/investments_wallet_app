@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.10.0 - 2026-10-20
+
+- Import confirmed dividend, JCP and fund-income credits from B3 movement reports, with broker attribution, duplicate protection and transactional schema-v6 storage.
+- Recover formerly ignored cash credits from archived originals without importing trades again.
+- Synchronize brapi announcements and original daily prices using the existing secure credential, retaining local data on unavailable or restricted requests.
+- Calculate gross entitlement estimates from negotiation-date holdings and daily return lines when complete original-price and corporate-action information is available.
+- Add upcoming announcements, refresh controls, coverage warnings and reconciliation that keeps reported receipts separate from estimates.
+- Add six synthetic B3 XLSX development examples and document their import sequence, expected balances and dividend-data limitations.
+
 ## v0.9.0 - 2026-10-20
 
 - Add a BETA badge to the Income Tax navigation item in expanded and compact menus.

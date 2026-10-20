@@ -31,7 +31,8 @@ class ReportUploadPage extends StatelessWidget {
         const Text(
           'Compras e vendas de ações, FIIs, ETFs, BDRs e Tesouro Direto. '
           'Transferência - Liquidação com crédito registra compra e com débito registra venda, pela data de liquidação. '
-          'Opções, futuros e outros produtos são ignorados. Proventos, '
+          'Dividendos, JCP e rendimentos creditados são importados para a tela de dividendos. '
+          'Opções, futuros e outros produtos são ignorados. '
           'outras transferências e eventos corporativos não alteram a carteira nesta versão. '
           'Importe todo o histórico de compras e vendas; vendas sem saldo serão bloqueadas. '
           'PDF, XLS e relatórios de Posição ainda não são aceitos.',
@@ -73,7 +74,7 @@ class ReportUploadPage extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           Text(
-            '${report.layouts.join(' / ')} · ${report.trades.length} operação(ões) elegível(is)',
+            '${report.layouts.join(' / ')} · ${report.trades.length} operação(ões) · ${report.dividends.length} provento(s) elegível(is)',
           ),
           const SizedBox(height: 8),
           if (report.trades.any(
@@ -93,6 +94,13 @@ class ReportUploadPage extends StatelessWidget {
             'Preços de operações não são cotações atuais; o preço médio não inclui corretagem, taxas ou impostos.',
           ),
           ..._previewAssets(report.trades),
+          for (final dividend in report.dividends)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                '${dividend.symbol} · ${dividend.broker} · provento recebido: R\$ ${(dividend.amountCents / 100).toStringAsFixed(2)}',
+              ),
+            ),
           ReportIssuesList(issues: report.issues),
           const SizedBox(height: 16),
           Align(
@@ -110,7 +118,7 @@ class ReportUploadPage extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 8),
               child: Text(
-                'Selecione a classificação de cada ativo pendente. É necessária ao menos uma operação elegível.',
+                'Selecione a classificação de cada ativo pendente. É necessária ao menos uma operação ou provento elegível.',
               ),
             ),
         ],

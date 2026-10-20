@@ -5,28 +5,38 @@ import 'package:sqlite3/sqlite3.dart';
 import '../domain/dividend_payment.dart';
 import '../domain/dividend_repository.dart';
 import '../../reports/data/sqlite_report_repository.dart';
+import 'reported_dividend_store.dart';
+import 'dividend_market_cache.dart';
+import '../domain/dividend_projection.dart';
 
 class SqliteDividendRepository implements DividendRepository {
   const SqliteDividendRepository(this.databasePath);
   final String databasePath;
 
   /// Public infrastructure contract used by portfolio valuation reads.
-  static Map<String, int> receivedTotals(Database database, DateTime asOf) => {
-    for (final row in database.select(
-      '''SELECT symbol, SUM(amount_cents) AS total
+  static Map<String, int> receivedTotals(Database database, DateTime asOf) {
+    final totals = <String, int>{
+      for (final row in database.select(
+        '''SELECT symbol, SUM(amount_cents) AS total
       FROM dividends WHERE is_received = 1 AND paid_at <= ? GROUP BY symbol''',
-      [asOf.toIso8601String().substring(0, 10)],
-    ))
-      row['symbol'] as String: row['total'] as int,
-  };
+        [asOf.toIso8601String().substring(0, 10)],
+      ))
+        row['symbol'] as String: row['total'] as int,
+    };
+    for (final entry in ReportedDividendStore.totals(database, asOf).entries) {
+      totals.update(
+        entry.key,
+        (v) => v + entry.value,
+        ifAbsent: () => entry.value,
+      );
+    }
+    return totals;
+  }
 
   @override
   Future<DividendData> loadData() => Isolate.run(() {
     final database = sqlite3.open(databasePath);
     try {
-      if (SqliteReportRepository.hasReports(database)) {
-        return const DividendData(payments: [], valuations: [], demo: false);
-      }
       final payments = database
           .select('SELECT * FROM dividends ORDER BY paid_at DESC, id')
           .map(
@@ -60,7 +70,19 @@ class SqliteDividendRepository implements DividendRepository {
             ),
           )
           .toList();
-      return DividendData(payments: payments, valuations: valuations);
+      if (SqliteReportRepository.hasReports(database)) {
+        return projectDividends(
+          trades: SqliteReportRepository.readTrades(database),
+          received: [...payments, ...ReportedDividendStore.load(database)],
+          market: DividendMarketCache.load(database),
+          asOf: DateTime.now(),
+        );
+      }
+      return DividendData(
+        payments: [...payments, ...ReportedDividendStore.load(database)],
+        valuations: valuations,
+        demo: !SqliteReportRepository.hasReports(database),
+      );
     } finally {
       database.close();
     }

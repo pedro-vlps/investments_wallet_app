@@ -7,10 +7,12 @@ import 'package:csv/csv.dart';
 import 'package:excel/excel.dart';
 
 import '../../portfolio/domain/asset_category.dart';
+import '../../dividends/domain/reported_dividend.dart';
 import '../domain/report_document.dart';
 import '../domain/report_trade.dart';
 import 'b3_listed_asset.dart';
 import 'b3_value_parser.dart';
+import 'b3_dividend_parser.dart';
 
 class B3ReportParser {
   static const maxBytes = 10 * 1024 * 1024;
@@ -85,6 +87,7 @@ class B3ReportParser {
 
   ParsedReport _tables(Map<String, List<List<Object?>>> tables) {
     final trades = <ReportTrade>[];
+    final dividends = <ReportedDividend>[];
     final issues = <ReportIssue>[];
     final layouts = <String>{};
     var dataRows = 0;
@@ -153,6 +156,22 @@ class B3ReportParser {
         final movement = normalizeB3Text(
           cell(negotiation ? 'tipo de movimentacao' : 'movimentacao'),
         );
+        final dividendKind = negotiation ? null : b3DividendKind(movement);
+        if (dividendKind != null) {
+          final dividend = parseB3Dividend(
+            cell: cell,
+            kind: dividendKind,
+            location: location,
+          );
+          if (dividend == null) {
+            issues.add(
+              ReportIssue(location, 'Provento de produto fora do escopo.'),
+            );
+          } else {
+            dividends.add(dividend);
+          }
+          continue;
+        }
         final settlement =
             !negotiation &&
             RegExp(r'^transferencia\s*[-–—]\s*liquidacao$').hasMatch(movement);
@@ -290,6 +309,11 @@ class B3ReportParser {
         'Layout não reconhecido. Exporte Negociação ou Movimentação da Área do Investidor B3. Relatórios de Posição e notas de corretagem não são aceitos nesta versão.',
       );
     }
-    return ParsedReport(trades: trades, issues: issues, layouts: layouts);
+    return ParsedReport(
+      trades: trades,
+      issues: issues,
+      layouts: layouts,
+      dividends: dividends,
+    );
   }
 }

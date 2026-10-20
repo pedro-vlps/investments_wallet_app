@@ -84,7 +84,11 @@ class _DividendPaymentsTableState extends State<DividendPaymentsTable> {
                           DataCell(Text(p.symbol)),
                           DataCell(
                             Text(
-                              p.received ? 'Recebido' : 'Provisionado',
+                              p.received
+                                  ? 'Recebido'
+                                  : p.estimated
+                                  ? 'Estimado bruto / a confirmar'
+                                  : 'Provisionado',
                               style: TextStyle(
                                 color: p.received
                                     ? WalletColors.accent
@@ -92,13 +96,7 @@ class _DividendPaymentsTableState extends State<DividendPaymentsTable> {
                               ),
                             ),
                           ),
-                          DataCell(
-                            Text(
-                              p.kind == DividendKind.dividend
-                                  ? 'Dividendo'
-                                  : 'JCP',
-                            ),
-                          ),
+                          DataCell(Text(dividendKindLabel(p.kind))),
                           DataCell(Text(formatPerShare(p.perShareMicros))),
                           DataCell(
                             Text(

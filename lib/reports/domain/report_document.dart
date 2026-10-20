@@ -1,4 +1,5 @@
 import 'report_trade.dart';
+import '../../dividends/domain/reported_dividend.dart';
 
 class ReportIssue {
   const ReportIssue(this.location, this.reason);
@@ -11,10 +12,12 @@ class ParsedReport {
     required this.trades,
     required this.issues,
     required this.layouts,
+    this.dividends = const [],
   });
   final List<ReportTrade> trades;
   final List<ReportIssue> issues;
   final Set<String> layouts;
+  final List<ReportedDividend> dividends;
 }
 
 class ReportAssetSummary {
@@ -43,6 +46,8 @@ class StoredReport {
     required this.assets,
     required this.issues,
     required this.duplicateTrades,
+    this.dividendCount = 0,
+    this.duplicateDividends = 0,
   });
   final String id;
   final String name;
@@ -51,4 +56,6 @@ class StoredReport {
   final List<ReportAssetSummary> assets;
   final List<ReportIssue> issues;
   final int duplicateTrades;
+  final int dividendCount;
+  final int duplicateDividends;
 }
