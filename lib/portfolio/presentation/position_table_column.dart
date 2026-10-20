@@ -2,20 +2,14 @@ import '../domain/portfolio_position.dart';
 
 enum PositionTableColumn {
   symbol('ATIVO'),
-  company('EMPRESA'),
-  quantity('QUANTIDADE', numeric: true),
-  averageCost('PREÇO MÉDIO', numeric: true),
+  quantity('QUANTIDADE', numeric: true, detailedOnly: true),
+  averageCost('PREÇO MÉDIO', numeric: true, detailedOnly: true),
   invested('TOTAL INVESTIDO', numeric: true, detailedOnly: true),
-  quotePrice('ÚLTIMA COTAÇÃO', numeric: true),
-  marketValue('VALOR ATUAL', numeric: true),
+  quotePrice('ÚLTIMA COTAÇÃO', numeric: true, detailedOnly: true),
+  marketValue('VALOR ATUAL', numeric: true, detailedOnly: true),
   allocation('POSIÇÃO (%)', numeric: true, detailedOnly: true),
   gain('RESULTADO (R\$)', numeric: true),
-  gainPercent('RENTABILIDADE (%)', numeric: true),
-  dividends('DIVIDENDOS RECEBIDOS', numeric: true, detailedOnly: true),
-  totalGain('ACUMULADO (R\$)', numeric: true, detailedOnly: true),
-  totalGainPercent('ACUMULADA (%)', numeric: true, detailedOnly: true),
-  quotedAt('COTAÇÃO EM'),
-  source('FONTE');
+  gainPercent('RESULTADO (%)', numeric: true);
 
   const PositionTableColumn(
     this.label, {
@@ -28,7 +22,6 @@ enum PositionTableColumn {
 
   int compare(PortfolioPosition a, PortfolioPosition b) => switch (this) {
     symbol => a.symbol.compareTo(b.symbol),
-    company => a.company.toLowerCase().compareTo(b.company.toLowerCase()),
     quantity => a.quantity.compareTo(b.quantity),
     averageCost => a.averageCostCents.compareTo(b.averageCostCents),
     invested => a.investedCents.compareTo(b.investedCents),
@@ -38,11 +31,6 @@ enum PositionTableColumn {
     allocation => a.marketValueCents.compareTo(b.marketValueCents),
     gain => a.unrealizedGainCents.compareTo(b.unrealizedGainCents),
     gainPercent => a.unrealizedGainPercent.compareTo(b.unrealizedGainPercent),
-    dividends => a.dividendsReceivedCents.compareTo(b.dividendsReceivedCents),
-    totalGain => a.totalGainCents.compareTo(b.totalGainCents),
-    totalGainPercent => a.totalGainPercent.compareTo(b.totalGainPercent),
-    quotedAt => a.quote.quotedAt.compareTo(b.quote.quotedAt),
-    source => a.quote.source.compareTo(b.quote.source),
   };
 }
 

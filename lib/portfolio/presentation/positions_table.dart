@@ -93,7 +93,6 @@ class _PositionsTableState extends State<PositionsTable> {
   ) {
     final text = switch (column) {
       PositionTableColumn.symbol => position.symbol,
-      PositionTableColumn.company => position.company,
       PositionTableColumn.quantity => NumberFormat(
         '#,##0.######',
         'pt_BR',
@@ -109,21 +108,10 @@ class _PositionsTableState extends State<PositionsTable> {
       PositionTableColumn.gainPercent => formatPercent(
         position.unrealizedGainPercent,
       ),
-      PositionTableColumn.dividends => formatMoney(
-        position.dividendsReceivedCents,
-      ),
-      PositionTableColumn.totalGain => formatMoney(position.totalGainCents),
-      PositionTableColumn.totalGainPercent => formatPercent(
-        position.totalGainPercent,
-      ),
-      PositionTableColumn.quotedAt => formatQuoteTime(position.quote.quotedAt),
-      PositionTableColumn.source => position.quote.source,
     };
     final color = switch (column) {
       PositionTableColumn.gain || PositionTableColumn.gainPercent =>
         returnColor(position.unrealizedGainCents),
-      PositionTableColumn.totalGain || PositionTableColumn.totalGainPercent =>
-        returnColor(position.totalGainCents),
       _ => null,
     };
     return DataCell(

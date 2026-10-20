@@ -12,5 +12,8 @@ class MainFlutterWindow: NSWindow {
 
     super.awakeFromNib()
     self.title = "Local Wallet"
+    if let visibleFrame = self.screen?.visibleFrame {
+      self.setFrame(visibleFrame, display: true)
+    }
   }
 }

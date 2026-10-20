@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.0 - 2026-10-20
+
+- Reduce the summary portfolio table to asset and price result in BRL and percent, and remove the requested detailed-table columns while preserving sorting and return colors.
+- Start desktop windows maximized on Windows and Linux and fit the initial macOS window to the visible screen area.
+- Update the portfolio help text and view documentation to match the remaining columns.
+
 ## v0.7.0 - 2026-10-20
 
 - Authenticate optional brapi quote requests using a per-device API key in the Authorization header.

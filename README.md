@@ -14,9 +14,9 @@ Click any column heading to sort ascending, and click again to reverse the order
 Sorting uses underlying numeric values and timestamps, not formatted text.
 The horizontal scrollbar exposes additional columns in narrow windows.
 
-The detailed view adds invested capital, portfolio weight, received dividends,
-and cumulative gains in BRL and percent. Each attribute, including company,
-quote source, and quote time, has its own sortable column.
+The summary table contains the asset and price result in BRL and percent. The
+detailed view adds quantity, average cost, invested capital, latest quote, market
+value and portfolio weight. Every displayed column is sortable.
 
 - Portfolio weight = asset market value / total portfolio market value.
 - Price return = (market value - acquisition cost) / acquisition cost.

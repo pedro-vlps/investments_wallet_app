@@ -215,9 +215,8 @@ class PortfolioPage extends StatelessWidget {
                               const Padding(
                                 padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
                                 child: Text(
-                                  'Posição = valor do ativo / valor da carteira. Acumulada = '
-                                  '(valor atual − custo + dividendos recebidos) / custo. '
-                                  'Retorno simples, sem reinvestimento. Clique nos cabeçalhos para ordenar.',
+                                  'Posição = valor do ativo / valor da carteira. '
+                                  'Clique nos cabeçalhos para ordenar.',
                                   style: TextStyle(
                                     color: WalletColors.muted,
                                     fontSize: 12,
