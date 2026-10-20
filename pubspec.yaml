@@ -1,7 +1,7 @@
 name: investments_wallet
 description: An offline-first desktop investment portfolio for B3 assets.
 publish_to: none
-version: 0.8.0+9
+version: 0.8.1+10
 
 environment:
   sdk: '>=3.11.0 <4.0.0'

@@ -79,14 +79,34 @@ class TaxRulesCard extends StatelessWidget {
               title: const Text('Fontes oficiais monitoradas'),
               children: [
                 for (final source in taxSources)
-                  ListTile(
-                    title: Text(source.title),
-                    subtitle: SelectableText(source.url),
-                    trailing: IconButton(
-                      tooltip: 'Copiar endereço da fonte',
-                      icon: const Icon(Icons.copy),
-                      onPressed: () =>
-                          Clipboard.setData(ClipboardData(text: source.url)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(source.title),
+                              const SizedBox(height: 4),
+                              SelectionArea(
+                                child: Text(
+                                  source.url,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Copiar endereço da fonte',
+                          icon: const Icon(Icons.copy),
+                          onPressed: () => Clipboard.setData(
+                            ClipboardData(text: source.url),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
               ],

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.1 - 2026-10-20
+
+- Replace editable source links with selectable text and responsive rows in the monitored tax sources panel, preserving URL copying.
+
 ## v0.8.0 - 2026-10-20
 
 - Reduce the summary portfolio table to asset and price result in BRL and percent, and remove the requested detailed-table columns while preserving sorting and return colors.
